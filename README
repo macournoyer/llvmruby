@@ -1,0 +1,45 @@
+* What's LLVMRuby
+
+LLVMRuby is a set of bindings making the LLVM compiler infrastructure 
+(http://llvm.org) usable from Ruby.  This extention allows using LLVM
+as an abstract assembler and reflects a good chunk of the LLVM class
+hierarchy into Ruby.  Included is an example of using this to built
+a simple JIT compiler, written entirely in Ruby, which is able to 
+interact with the native Ruby 1.8/1.9 data types.
+
+* How to build
+
+You must get and build LLVM seperately, available for download at:
+
+  http://llvm.org/releases  
+
+Add the llvm bin directory to your path, extconf needs to be able to find llvm-conf:
+
+  $ export PATH=$PATH:/$LLVMDIR/Debug/bin
+
+Once you have built LLVM, run extconf.rb giving it location of LLVM:
+
+  $ ruby extconf.rb --with-llvm-include=/$DIR/llvm/include --with-llvm-lib=/$DIR/llvm/Debug/lib
+
+Run make
+
+  $ make
+
+Look in test.rb to see examples of use and start messing around.
+
+* Caveats
+
+I created this for version 2.3 of LLVM.  Other versions may not work.
+I have only been using this on 64bit machines.  I know for a fact that
+the example JIT assumes that you are using 64bit Ruby.  These should
+be quite easy to change in the Ruby code, but I have no machine to 
+test that on.
+
+* Copying
+
+See the file COPYING
+
+* Author
+
+For questions or answers, my email is: tomatobagby@gmail.com
+
