@@ -107,9 +107,9 @@ void Init_llvmruby() {
   rb_define_method(cLLVMBuilder, "create_struct_gep", llvm_builder_create_struct_gep, 2);
   rb_define_method(cLLVMBuilder, "create_int_to_ptr", llvm_builder_create_int_to_ptr, 2);
 
-  printf("sizeof long: %d\n", (int)sizeof(long));
-  printf("sizeof ptr: %d\n", (int)sizeof(long*));
-  printf("sizeof value: %d\n", (int)sizeof(VALUE));
-  printf("sizeof array: %d\n", (int)sizeof(struct RArray));
-  printf("sizeof char: %d\n", (int)sizeof(char));
+  //printf("sizeof long: %d\n", (int)sizeof(long));
+  //printf("sizeof ptr: %d\n", (int)sizeof(long*));
+  //printf("sizeof value: %d\n", (int)sizeof(VALUE));
+  //printf("sizeof array: %d\n", (int)sizeof(struct RArray));
+  //printf("sizeof char: %d\n", (int)sizeof(char));
 }

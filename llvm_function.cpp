@@ -24,6 +24,8 @@ VALUE llvm_function_call2(VALUE self, VALUE n) {
   return data->FP(n);
 }
 
+ExecutionEngine *EE = NULL;
+
 VALUE llvm_function_compile(VALUE self) {
   cout << "Compiling!\n";
   
@@ -44,8 +46,10 @@ VALUE llvm_function_compile(VALUE self) {
   p.run(*data->M);
 */
 
-  ExistingModuleProvider *MP = new ExistingModuleProvider(data->M);
-  ExecutionEngine *EE = ExecutionEngine::create(MP, false);
+  if(EE == NULL) {
+    ExistingModuleProvider *MP = new ExistingModuleProvider(data->M);
+    EE = ExecutionEngine::create(MP, false);
+  }
 
   std::cerr << "verifying... ";
   if (verifyModule(*data->M)) {

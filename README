@@ -9,7 +9,7 @@ interact with the native Ruby 1.8/1.9 data types.
 
 * How to build
 
-You must get and build LLVM seperately, available for download at:
+You must get and build LLVM separately, available for download at:
 
   http://llvm.org/releases  
 
@@ -34,6 +34,11 @@ I have only been using this on 64bit machines.  I know for a fact that
 the example JIT assumes that you are using 64bit Ruby.  These should
 be quite easy to change in the Ruby code, but I have no machine to 
 test that on.
+
+* Things that definitely do not work right now
+
+No attempt has been made to properly free LLVM objects.  This probably
+isn't hard, LLVM api has easy to deal with memory management.
 
 * Copying
 
