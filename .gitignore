@@ -1,0 +1,4 @@
+Makefile
+llvmruby.so
+mkmf.log
+*.o

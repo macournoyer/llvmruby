@@ -3,7 +3,7 @@
 LLVMRuby is a set of bindings making the LLVM compiler infrastructure 
 (http://llvm.org) usable from Ruby.  This extention allows using LLVM
 as an abstract assembler and reflects a good chunk of the LLVM class
-hierarchy into Ruby.  Included is an example of using this to built
+hierarchy into Ruby.  Included is an example of using this to build
 a simple JIT compiler, written entirely in Ruby, which is able to 
 interact with the native Ruby 1.8/1.9 data types.
 
