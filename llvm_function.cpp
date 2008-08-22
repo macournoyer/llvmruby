@@ -27,7 +27,7 @@ VALUE llvm_function_call2(VALUE self, VALUE n) {
 ExecutionEngine *EE = NULL;
 
 VALUE llvm_function_compile(VALUE self) {
-  cout << "Compiling!\n";
+  //cout << "Compiling!\n";
   
   llvm_function_t* data;
   Data_Get_Struct(self, llvm_function_t, data);
@@ -51,11 +51,11 @@ VALUE llvm_function_compile(VALUE self) {
     EE = ExecutionEngine::create(MP, false);
   }
 
-  std::cerr << "verifying... ";
+  //std::cerr << "verifying... ";
   if (verifyModule(*data->M)) {
     std::cerr << "Error constructing function!\n";
   }
-  std::cerr << "\n" << *data->M;
+  //std::cerr << "\n" << *data->M;
   data->FP = (long(*)(long))EE->getPointerToFunction(data->F);
   return Qnil;
 }
