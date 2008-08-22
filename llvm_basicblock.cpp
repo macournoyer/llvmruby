@@ -4,15 +4,32 @@ extern VALUE cLLVMBasicBlock;
 extern VALUE cLLVMBuilder;
 
 extern "C" {
-VALUE llvm_basic_block_wrap(BasicBlock* bb) { 
+VALUE 
+llvm_basic_block_wrap(BasicBlock* bb) { 
   return Data_Wrap_Struct(cLLVMBasicBlock, NULL, NULL, bb); 
 }
 
-VALUE llvm_basic_block_builder(VALUE self) {
+VALUE 
+llvm_basic_block_builder(VALUE self) {
   BasicBlock* bb;
   Data_Get_Struct(self, BasicBlock, bb);
   IRBuilder<> *builder = new IRBuilder<>(bb);
   return Data_Wrap_Struct(cLLVMBuilder, NULL, NULL, builder);
+}
+
+#define DATA_GET_BUILDER IRBuilder<>* builder; Data_Get_Struct(self, IRBuilder<>, builder);
+
+VALUE 
+llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
+  DATA_GET_BUILDER
+
+  Instruction::BinaryOps bin_op = (Instruction::BinaryOps)FIX2INT(rbin_op);
+  
+  Value *v1, *v2; 
+  Data_Get_Struct(rv1, Value, v1);
+  Data_Get_Struct(rv2, Value, v2);
+  Value *res = builder->CreateBinOp(bin_op, v1, v2);
+  return llvm_value_wrap(res);
 }
 
 VALUE llvm_builder_create_add(VALUE self, VALUE rv1, VALUE rv2) {

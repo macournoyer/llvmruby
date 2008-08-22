@@ -11,12 +11,16 @@ VALUE cLLVMPointerType = Qnil;
 VALUE cLLVMStructType = Qnil;
 VALUE cLLVMArrayType = Qnil;
 VALUE cLLVMVectorType = Qnil;
+VALUE cLLVMInstruction = Qnil;
+VALUE cLLVMBinaryOps = Qnil;
 
 void init_types();
 VALUE llvm_type_pointer(VALUE, VALUE);
 VALUE llvm_type_struct(VALUE, VALUE, VALUE);
 VALUE llvm_type_array(VALUE, VALUE, VALUE);
 VALUE llvm_type_vector(VALUE, VALUE, VALUE);
+
+void init_instructions();
 
 VALUE llvm_module_allocate(VALUE);
 VALUE llvm_module_initialize(VALUE); 
@@ -31,6 +35,7 @@ VALUE llvm_function_argument(VALUE);
 
 VALUE llvm_basic_block_builder(VALUE);
 
+VALUE llvm_builder_bin_op(VALUE, VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_add(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_sub(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_mul(VALUE, VALUE, VALUE);
@@ -68,6 +73,9 @@ void Init_llvmruby() {
   cLLVMBasicBlock = rb_define_class_under(cLLVMRuby, "BasicBlock", cLLVMValue);   
   cLLVMBuilder = rb_define_class_under(cLLVMRuby, "Builder", rb_cObject);
 
+  cLLVMInstruction = rb_define_class_under(cLLVMRuby, "Instruction", rb_cObject);
+  cLLVMBinaryOps = rb_define_class_under(cLLVMInstruction, "BinaryOps", rb_cObject);
+
   init_types();
   rb_define_module_function(cLLVMType, "pointer", llvm_type_pointer, 1);
   rb_define_module_function(cLLVMType, "struct", llvm_type_struct, 1);
@@ -75,6 +83,8 @@ void Init_llvmruby() {
   rb_define_module_function(cLLVMType, "vector", llvm_type_vector, 2);
 
   rb_define_module_function(cLLVMValue, "get_constant", llvm_value_get_constant, 1);
+
+  init_instructions();
 
   rb_define_alloc_func(cLLVMModule, llvm_module_allocate);
   rb_define_method(cLLVMModule, "initialize", llvm_module_initialize, 0);
@@ -89,6 +99,7 @@ void Init_llvmruby() {
 
   rb_define_method(cLLVMBasicBlock, "builder", llvm_basic_block_builder, 0);
 
+  rb_define_method(cLLVMBuilder, "bin_op", llvm_builder_bin_op, 3);
   rb_define_method(cLLVMBuilder, "create_add", llvm_builder_create_add, 2);
   rb_define_method(cLLVMBuilder, "create_sub", llvm_builder_create_sub, 2);
   rb_define_method(cLLVMBuilder, "create_mul", llvm_builder_create_mul, 2);
