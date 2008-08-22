@@ -36,14 +36,6 @@ VALUE llvm_function_argument(VALUE);
 VALUE llvm_basic_block_builder(VALUE);
 
 VALUE llvm_builder_bin_op(VALUE, VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_add(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_sub(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_mul(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_and(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_xor(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_shl(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_lshr(VALUE, VALUE, VALUE);
-
 VALUE llvm_builder_create_return(VALUE, VALUE);
 VALUE llvm_builder_create_br(VALUE, VALUE);
 VALUE llvm_builder_create_cond_br(VALUE, VALUE, VALUE, VALUE);
@@ -100,13 +92,6 @@ void Init_llvmruby() {
   rb_define_method(cLLVMBasicBlock, "builder", llvm_basic_block_builder, 0);
 
   rb_define_method(cLLVMBuilder, "bin_op", llvm_builder_bin_op, 3);
-  rb_define_method(cLLVMBuilder, "create_add", llvm_builder_create_add, 2);
-  rb_define_method(cLLVMBuilder, "create_sub", llvm_builder_create_sub, 2);
-  rb_define_method(cLLVMBuilder, "create_mul", llvm_builder_create_mul, 2);
-  rb_define_method(cLLVMBuilder, "create_xor", llvm_builder_create_xor, 2);
-  rb_define_method(cLLVMBuilder, "create_shl", llvm_builder_create_shl, 2);
-  rb_define_method(cLLVMBuilder, "create_lshr", llvm_builder_create_lshr, 2);
-  rb_define_method(cLLVMBuilder, "create_and", llvm_builder_create_and, 2);
   rb_define_method(cLLVMBuilder, "create_return", llvm_builder_create_return, 1);
   rb_define_method(cLLVMBuilder, "create_br", llvm_builder_create_br, 1);
   rb_define_method(cLLVMBuilder, "create_cond_br", llvm_builder_create_cond_br, 3);

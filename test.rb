@@ -1,4 +1,4 @@
-require 'llvmruby'
+require 'llvm'
 require 'benchmark'
 
 include LLVM
@@ -9,7 +9,7 @@ def simple_test
   builder = bb.builder
   x = LLVM::Value.get_constant(23)
   y = LLVM::Value.get_constant(42)
-  tmp = builder.create_add(x, y)
+  tmp = builder.add(x, y)
   builder.create_return(tmp)
   f.compile
   puts "simple_test: #{f.call(0)}"
@@ -88,13 +88,13 @@ def fib_test
   builder = loop_block.builder
   current_counter = builder.create_load(counter)
   current_space = builder.create_gep(space, current_counter)
-  back_1 = builder.create_sub(current_counter, v1) 
-  back_2 = builder.create_sub(back_1, v1)
+  back_1 = builder.sub(current_counter, v1) 
+  back_2 = builder.sub(back_1, v1)
   back_1_space = builder.create_gep(space, back_1)
   back_2_space = builder.create_gep(space, back_2)
   back_1_val = builder.create_load(back_1_space)
   back_2_val = builder.create_load(back_2_space)
-  new_val = builder.create_add(back_1_val, back_2_val) 
+  new_val = builder.add(back_1_val, back_2_val) 
   builder.create_store(new_val, current_space)     
   new_counter = builder.create_add(current_counter, v1)
   builder.create_store(new_counter, counter)
@@ -103,7 +103,7 @@ def fib_test
   builder.create_cond_br(cmp, exit_block, loop_block)
   
   builder = exit_block.builder
-  last_idx = builder.create_sub(n, v1) 
+  last_idx = builder.sub(n, v1) 
   last_slot = builder.create_gep(space, current_counter)
   ret_val = builder.create_load(last_slot)
   builder.create_return(ret_val)
@@ -160,17 +160,17 @@ class Builder
   end
 
   def fixnum?(val)
-    create_and(FIXNUM_FLAG, val)
+    self.and(FIXNUM_FLAG, val)
   end
 
   def num2fix(val)
-    shifted = create_shl(val, 1.llvm)
+    shifted = shl(val, 1.llvm)
     create_xor(FIXNUM_FLAG, shifted)
   end
 
   def fix2int(val)
-    x = create_xor(FIXNUM_FLAG, val)
-    create_lshr(val, 1.llvm)
+    x = xor(FIXNUM_FLAG, val)
+    lshr(val, 1.llvm)
   end
 
   def slen(str)
@@ -321,17 +321,17 @@ def bytecode_test
     when :opt_plus
       v1 = b.fix2int(b.pop)
       v2 = b.fix2int(b.pop)
-      sum = b.create_add(v1, v2)     
+      sum = b.add(v1, v2)     
       b.push(b.num2fix(sum))
     when :opt_minus
       v1 = b.fix2int(b.pop)
       v2 = b.fix2int(b.pop)
-      sum = b.create_sub(v2, v1)
+      sum = b.sub(v2, v1)
       b.push(b.num2fix(sum))
     when :opt_mult
       v1 = b.fix2int(b.pop)
       v2 = b.fix2int(b.pop)
-      mul = b.create_mul(v1, v2)
+      mul = b.mul(v1, v2)
       b.push(b.num2fix(mul))
     when :opt_aref
       idx = b.fix2int(b.pop)
@@ -391,7 +391,7 @@ def test_builder
   #x = b.aref(arg, 3)
   #x = b.fix2int(x)
   #y = 10.llvm
-  #sum = b.create_add(x, y)
+  #sum = b.add(x, y)
   #b.aset(arg, 3, b.num2fix(sum))
   #b.create_return(arg) 
 
@@ -406,7 +406,7 @@ def test_fixnums
   b = block.builder
   arg = f.argument
   int = b.fix2int(arg)
-  sum = b.create_add(int, 23.llvm)
+  sum = b.add(int, 23.llvm)
   out = b.num2fix(sum)
   b.create_return(out)
   f.compile
@@ -448,8 +448,8 @@ def test_bitwise_ops
   builder = bb.builder
   arg = f.argument 
   out = builder.fixnum?(arg) 
-  out = builder.create_shl(1.llvm, 2.llvm)
-  out = builder.create_lshr(out, 1.llvm)
+  out = builder.shl(1.llvm, 2.llvm)
+  out = builder.lshr(out, 1.llvm)
   builder.create_return(out) 
   f.compile
   puts "out: #{f.call2(0)}"
