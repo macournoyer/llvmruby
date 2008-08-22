@@ -16,6 +16,10 @@ VALUE llvm_value_get_constant(VALUE self, VALUE v) {
   return llvm_value_wrap(ConstantInt::get(Type::Int64Ty, FIX2INT(v)));
 }
 
+VALUE llvm_value_get_float_constant(VALUE self, VALUE v) {
+  return llvm_value_wrap(ConstantFP::get(Type::FloatTy, RFLOAT(v)->value));
+}
+
 VALUE llvm_type_pointer(VALUE self, VALUE rtype) {
   Type *type;
   Data_Get_Struct(rtype, Type, type);

@@ -35,6 +35,7 @@ VALUE llvm_function_argument(VALUE);
 
 VALUE llvm_basic_block_builder(VALUE);
 
+VALUE llvm_builder_set_insert_point(VALUE, VALUE);
 VALUE llvm_builder_bin_op(VALUE, VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_return(VALUE, VALUE);
 VALUE llvm_builder_create_br(VALUE, VALUE);
@@ -49,6 +50,7 @@ VALUE llvm_builder_create_struct_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_int_to_ptr(VALUE, VALUE, VALUE);
 
 VALUE llvm_value_get_constant(VALUE);
+VALUE llvm_value_get_float_constant(VALUE);
 
 void Init_llvmruby() {
   cLLVMRuby = rb_define_module("LLVM");
@@ -75,6 +77,7 @@ void Init_llvmruby() {
   rb_define_module_function(cLLVMType, "vector", llvm_type_vector, 2);
 
   rb_define_module_function(cLLVMValue, "get_constant", llvm_value_get_constant, 1);
+  rb_define_module_function(cLLVMValue, "get_float_constant", llvm_value_get_float_constant, 1);
 
   init_instructions();
 
@@ -91,6 +94,7 @@ void Init_llvmruby() {
 
   rb_define_method(cLLVMBasicBlock, "builder", llvm_basic_block_builder, 0);
 
+  rb_define_method(cLLVMBuilder, "set_insert_point", llvm_builder_set_insert_point, 1);
   rb_define_method(cLLVMBuilder, "bin_op", llvm_builder_bin_op, 3);
   rb_define_method(cLLVMBuilder, "create_return", llvm_builder_create_return, 1);
   rb_define_method(cLLVMBuilder, "create_br", llvm_builder_create_br, 1);

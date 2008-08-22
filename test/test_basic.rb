@@ -58,4 +58,14 @@ class BasicTests < Test::Unit::TestCase
     builder_bin_op(:or, 15, 8, 15)
     builder_bin_op(:xor, 33, 15, 46)
   end
+
+  def test_insert_point
+    f = Function.new
+    b1 = f.create_block
+    b2 = f.create_block
+    builder = b1.builder
+    builder.create_br(b2)
+    builder.set_insert_point(b2)
+    builder.create_return(2.llvm)
+  end
 end

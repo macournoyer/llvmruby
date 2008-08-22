@@ -25,6 +25,10 @@ Run make
 
   $ make
 
+Run the tests (you will need Rake installed)
+
+  $ rake test
+
 Look in test.rb to see examples of use and start messing around.
 
 * Caveats

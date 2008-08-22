@@ -6,6 +6,12 @@ class Fixnum
   end
 end
 
+class Float
+  def llvm
+    LLVM::Value.get_float_constant(self)
+  end
+end
+
 module LLVM
   class Builder
     def self.add_bin_op(op)

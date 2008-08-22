@@ -18,6 +18,15 @@ llvm_basic_block_builder(VALUE self) {
 }
 
 #define DATA_GET_BUILDER IRBuilder<>* builder; Data_Get_Struct(self, IRBuilder<>, builder);
+#define DATA_GET_BLOCK   BasicBlock* bb; Data_Get_Struct(rbb, BasicBlock, bb);
+
+VALUE
+llvm_builder_set_insert_point(VALUE self, VALUE rbb) {
+  DATA_GET_BUILDER
+  DATA_GET_BLOCK 
+  builder->SetInsertPoint(bb);
+  return self;
+}
 
 VALUE 
 llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
@@ -32,7 +41,8 @@ llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
   return llvm_value_wrap(res);
 }
 
-VALUE llvm_builder_create_return(VALUE self, VALUE rv) {
+VALUE 
+llvm_builder_create_return(VALUE self, VALUE rv) {
   IRBuilder<>* builder;
   Data_Get_Struct(self, IRBuilder<>, builder);
 
@@ -41,7 +51,8 @@ VALUE llvm_builder_create_return(VALUE self, VALUE rv) {
   return llvm_value_wrap(builder->CreateRet(v));
 }
 
-VALUE llvm_builder_create_br(VALUE self, VALUE rblock) {
+VALUE 
+llvm_builder_create_br(VALUE self, VALUE rblock) {
   IRBuilder<>* builder;
   Data_Get_Struct(self, IRBuilder<>, builder);
 
@@ -50,7 +61,8 @@ VALUE llvm_builder_create_br(VALUE self, VALUE rblock) {
   return llvm_value_wrap(builder->CreateBr(bb)); 
 }  
 
-VALUE llvm_builder_create_cond_br(VALUE self, VALUE rcond, VALUE rtrue_block, VALUE rfalse_block) {
+VALUE 
+llvm_builder_create_cond_br(VALUE self, VALUE rcond, VALUE rtrue_block, VALUE rfalse_block) {
   IRBuilder<>* builder;
   Data_Get_Struct(self, IRBuilder<>, builder);
 
