@@ -5,7 +5,7 @@ include LLVM
 
 class BasicTests < Test::Unit::TestCase
   def bin_op(op, v1, v2, expected)
-    f = Function.new
+    f = Function.new("test_bin_op", Type::Int64Ty, [Type::Int64Ty])
     b = f.create_block.builder 
     ret = b.bin_op(op, v1.llvm, v2.llvm)
     b.create_return(ret)
@@ -33,7 +33,7 @@ class BasicTests < Test::Unit::TestCase
   end
 
   def builder_bin_op(op, v1, v2, expected)
-    f = Function.new
+    f = Function.new("test_builder_ops", Type::Int64Ty, [Type::Int64Ty])
     b = f.create_block.builder
     ret = b.send(op, v1.llvm, v2.llvm)
     b.create_return(ret)
@@ -60,12 +60,23 @@ class BasicTests < Test::Unit::TestCase
   end
 
   def test_insert_point
-    f = Function.new
+    f = Function.new("test_insert_point", Type::Int64Ty, [Type::Int64Ty])
     b1 = f.create_block
     b2 = f.create_block
     builder = b1.builder
     builder.create_br(b2)
     builder.set_insert_point(b2)
     builder.create_return(2.llvm)
+  end
+
+  def test_builder_utils
+    f = Function.new("test_builder_utils", Type::Int64Ty, [Type::Int64Ty])
+    b = f.create_block.builder
+    b.write do
+      ret = add(2.llvm, 3.llvm) 
+      create_return(ret)
+    end
+    f.compile
+    assert_equal(5, f.call(0))
   end
 end

@@ -11,6 +11,7 @@ VALUE cLLVMPointerType = Qnil;
 VALUE cLLVMStructType = Qnil;
 VALUE cLLVMArrayType = Qnil;
 VALUE cLLVMVectorType = Qnil;
+VALUE cLLVMFunctionType = Qnil;
 VALUE cLLVMInstruction = Qnil;
 VALUE cLLVMBinaryOps = Qnil;
 
@@ -26,7 +27,7 @@ VALUE llvm_module_allocate(VALUE);
 VALUE llvm_module_initialize(VALUE); 
 
 VALUE llvm_function_allocate(VALUE);
-VALUE llvm_function_initialize(VALUE); 
+VALUE llvm_function_initialize(VALUE, VALUE, VALUE, VALUE, VALUE);
 VALUE llvm_function_create_block(VALUE);
 VALUE llvm_function_compile(VALUE);
 VALUE llvm_function_call(VALUE, VALUE);
@@ -60,6 +61,7 @@ void Init_llvmruby() {
   cLLVMStructType = rb_define_class_under(cLLVMRuby, "StructType", cLLVMType);
   cLLVMArrayType = rb_define_class_under(cLLVMRuby, "ArrayType", cLLVMType);
   cLLVMVectorType = rb_define_class_under(cLLVMRuby, "VectorType", cLLVMType);
+  cLLVMFunctionType = rb_define_class_under(cLLVMRuby, "FunctionType", cLLVMType);
 
   cLLVMValue = rb_define_class_under(cLLVMRuby, "Value", rb_cObject);
   cLLVMModule = rb_define_class_under(cLLVMRuby, "Module", rb_cObject);
@@ -85,7 +87,7 @@ void Init_llvmruby() {
   rb_define_method(cLLVMModule, "initialize", llvm_module_initialize, 0);
 
   rb_define_alloc_func(cLLVMFunction, llvm_function_allocate);
-  rb_define_method(cLLVMFunction, "initialize", llvm_function_initialize, 0);
+  rb_define_method(cLLVMFunction, "initialize", llvm_function_initialize, 3);
   rb_define_method(cLLVMFunction, "create_block", llvm_function_create_block, 0);
   rb_define_method(cLLVMFunction, "compile", llvm_function_compile, 0);
   rb_define_method(cLLVMFunction, "call", llvm_function_call, 1);

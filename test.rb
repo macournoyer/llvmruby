@@ -3,8 +3,12 @@ require 'benchmark'
 
 include LLVM
 
+def testf
+  LLVM::Function.new('type', Type::Int64Ty, [Type::Int64Ty])
+end
+
 def simple_test
-  f = LLVM::Function.new
+  f = testf
   bb = f.create_block
   builder = bb.builder
   x = LLVM::Value.get_constant(23)
@@ -16,7 +20,7 @@ def simple_test
 end
 
 def call_test
-  f = LLVM::Function.new
+  f = LLVM::testf
   entry_block = f.create_block
   subroutine_block = f.create_block
 
@@ -40,7 +44,7 @@ def call_test
 end
 
 def cond_br_test
-  f = Function.new
+  f = testf
   entry_block = f.create_block
   true_block = f.create_block
   false_block = f.create_block
@@ -63,7 +67,7 @@ def cond_br_test
 end
 
 def fib_test
-  f = Function.new
+  f = testf
   n = f.argument
   entry_block = f.create_block 
   loop_block = f.create_block
@@ -280,7 +284,7 @@ def bytecode_test
     [:opt_aref] 
   ]
 
-  f = Function.new
+  f = testf
   entry_block = f.create_block
   b = entry_block.builder
   Builder.set_globals(b)
@@ -380,7 +384,7 @@ def test_types
 end
 
 def test_builder
-  f = Function.new
+  f = testf
   block = f.create_block
   b = block.builder
 
@@ -401,7 +405,7 @@ def test_builder
 end
 
 def test_fixnums
-  f = Function.new
+  f = testf
   block = f.create_block
   b = block.builder
   arg = f.argument
@@ -414,7 +418,7 @@ def test_fixnums
 end
 
 def test_array
-  f = Function.new
+  f = testf
   block = f.create_block
   b = block.builder
 
@@ -443,7 +447,7 @@ def test_array
 end
 
 def test_bitwise_ops
-  f = Function.new
+  f = testf
   bb = f.create_block
   builder = bb.builder
   arg = f.argument 
