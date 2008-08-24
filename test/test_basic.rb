@@ -4,13 +4,29 @@ require 'llvm'
 include LLVM
 
 class BasicTests < Test::Unit::TestCase
+  def function_tester(expected)
+    m = LLVM::Module.new("test_module")
+    type = Type::function(Type::Int64Ty, [])
+    f = m.get_or_insert_function("test", type)
+    yield(f)
+    ExecutionEngine.get(m);
+    assert_equal(expected, ExecutionEngine.run_function(f, nil))
+  end
+
+  def test_module
+    function_tester(5) do |f|
+      b = f.create_block.builder
+      v = b.add(2.llvm, 3.llvm)
+      b.create_return(v)
+    end
+  end
+
   def bin_op(op, v1, v2, expected)
-    f = Function.new("test_bin_op", Type::Int64Ty, [Type::Int64Ty])
-    b = f.create_block.builder 
-    ret = b.bin_op(op, v1.llvm, v2.llvm)
-    b.create_return(ret)
-    f.compile
-    assert_equal(expected, f.call(0))
+    function_tester(expected) do |f|
+      b = f.create_block.builder 
+      ret = b.bin_op(op, v1.llvm, v2.llvm)
+      b.create_return(ret)
+    end
   end
 
   def test_bin_ops
@@ -33,12 +49,11 @@ class BasicTests < Test::Unit::TestCase
   end
 
   def builder_bin_op(op, v1, v2, expected)
-    f = Function.new("test_builder_ops", Type::Int64Ty, [Type::Int64Ty])
-    b = f.create_block.builder
-    ret = b.send(op, v1.llvm, v2.llvm)
-    b.create_return(ret)
-    f.compile
-    assert_equal(expected, f.call(0))
+    function_tester(expected) do |f|
+      b = f.create_block.builder
+      ret = b.send(op, v1.llvm, v2.llvm)
+      b.create_return(ret)
+    end
   end
 
   def test_builder_bin_ops
@@ -60,23 +75,53 @@ class BasicTests < Test::Unit::TestCase
   end
 
   def test_insert_point
-    f = Function.new("test_insert_point", Type::Int64Ty, [Type::Int64Ty])
-    b1 = f.create_block
-    b2 = f.create_block
-    builder = b1.builder
-    builder.create_br(b2)
-    builder.set_insert_point(b2)
-    builder.create_return(2.llvm)
+    function_tester(2) do |f|
+      b1 = f.create_block
+      b2 = f.create_block
+      builder = b1.builder
+      builder.create_br(b2)
+      builder.set_insert_point(b2)
+      builder.create_return(2.llvm)
+    end
   end
 
   def test_builder_utils
-    f = Function.new("test_builder_utils", Type::Int64Ty, [Type::Int64Ty])
-    b = f.create_block.builder
-    b.write do
-      ret = add(2.llvm, 3.llvm) 
-      create_return(ret)
+    function_tester(5) do |f|
+      b = f.create_block.builder
+      b.write do
+        ret = add(2.llvm, 3.llvm) 
+        create_return(ret)
+      end
     end
-    f.compile
-    assert_equal(5, f.call(0))
   end
+
+  def test_function_calls
+    m = LLVM::Module.new("test_module")
+    type = Type::function(Type::Int64Ty, [])
+    f_caller = m.get_or_insert_function("caller", type)
+    type = Type::function(Type::Int64Ty, [Type::Int64Ty, Type::Int64Ty])
+    f_callee = m.get_or_insert_function("callee", type)
+
+    b = f_callee.create_block.builder
+    x, y = f_callee.arguments
+    sum = b.add(x, y)
+    b.create_return(sum)
+    
+    b = f_caller.create_block.builder
+    ret = b.create_call(f_callee, 2.llvm, 3.llvm)
+    b.create_return(ret)
+
+    result = ExecutionEngine.get(m)
+    assert(5, result)
+  end
+
+  #def test_get_global
+  #  f = Function.new("test_get_global", Type::Int64Ty, [Type::Int64Ty])
+  #  b = f.create_block.builder
+  #  vp = b.get_global
+  #  v = b.create_load(vp)
+  #  b.create_return(v)
+  #  f.compile
+  #  assert_equal(23, f.call2(0))
+  #end
 end

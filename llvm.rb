@@ -12,6 +12,10 @@ class Float
   end
 end
 
+def testf
+  Function.new('shaka', Type::Int32Ty, [Type::Int32Ty])
+end
+
 module LLVM
   class Builder
     def self.add_bin_op(op)

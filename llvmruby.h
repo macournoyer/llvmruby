@@ -19,6 +19,39 @@ using namespace llvm;
 
 #include "ruby.h"
 
-extern "C" VALUE llvm_value_wrap(Value*);
-extern "C" VALUE llvm_basic_block_wrap(BasicBlock*);
-extern "C" VALUE llvm_function_create_block(VALUE);
+extern VALUE cLLVMRuby;
+extern VALUE cLLVMValue;
+extern VALUE cLLVMModule;
+extern VALUE cLLVMFunction;
+extern VALUE cLLVMBasicBlock;
+extern VALUE cLLVMBuilder;
+extern VALUE cLLVMType;
+extern VALUE cLLVMPointerType;
+extern VALUE cLLVMStructType;
+extern VALUE cLLVMArrayType;
+extern VALUE cLLVMVectorType;
+extern VALUE cLLVMFunctionType;
+extern VALUE cLLVMInstruction;
+extern VALUE cLLVMBinaryOps;
+extern VALUE cLLVMPassManager;
+
+/*
+typedef struct {
+  Module *M;
+  Function* F;
+  long(*FP)(long);
+} llvm_function_t;
+*/
+
+#define LLVM_VAL(obj) ((Value*)DATA_PTR(obj))
+#define LLVM_TYPE(obj) ((Type*)DATA_PTR(obj))
+#define LLVM_FUNC_TYPE(obj) ((FunctionType*)DATA_PTR(obj))
+#define LLVM_MODULE(obj) ((Module*)DATA_PTR(obj))
+#define LLVM_FUNCTION(obj) ((Function*)DATA_PTR(obj))
+
+extern "C" {
+VALUE llvm_value_wrap(Value*);
+VALUE llvm_function_wrap(Function*);
+VALUE llvm_basic_block_wrap(BasicBlock*);
+VALUE llvm_function_create_block(VALUE);
+}

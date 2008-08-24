@@ -3,8 +3,16 @@ require 'benchmark'
 
 include LLVM
 
+@module = LLVM::Module.new('test')
+ExecutionEngine.get(@module)
+
 def testf
-  LLVM::Function.new('type', Type::Int64Ty, [Type::Int64Ty])
+  type = Type.function(Type::Int64Ty, [Type::Int64Ty])
+  f = @module.get_or_insert_function('test', type)
+end
+
+def call(f, arg)
+  ExecutionEngine.run_function(f, arg)
 end
 
 def simple_test
@@ -288,7 +296,7 @@ def bytecode_test
   entry_block = f.create_block
   b = entry_block.builder
   Builder.set_globals(b)
-  b.push(f.argument)
+  b.push(f.arguments.first)
 
   blocks = bytecode.map { f.create_block } 
   exit_block = f.create_block
@@ -365,9 +373,8 @@ def bytecode_test
   ret_val = b.pop
   b.create_return(ret_val)
 
-  f.compile 
-
-  puts "returned: #{f.call2([1,2,3,4,5,6,7,8,9,10])}"
+  ret = call(f, [1,2,3,4,5,6,7,8,9,10])
+  puts "returned: #{ret}"
 end
 
 bytecode_test

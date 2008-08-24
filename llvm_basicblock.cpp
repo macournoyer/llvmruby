@@ -17,8 +17,8 @@ llvm_basic_block_builder(VALUE self) {
   return Data_Wrap_Struct(cLLVMBuilder, NULL, NULL, builder);
 }
 
-#define DATA_GET_BUILDER IRBuilder<>* builder; Data_Get_Struct(self, IRBuilder<>, builder);
-#define DATA_GET_BLOCK   BasicBlock* bb; Data_Get_Struct(rbb, BasicBlock, bb);
+#define DATA_GET_BUILDER IRBuilder<> *builder; Data_Get_Struct(self, IRBuilder<>, builder);
+#define DATA_GET_BLOCK   BasicBlock *bb; Data_Get_Struct(rbb, BasicBlock, bb);
 
 VALUE
 llvm_builder_set_insert_point(VALUE self, VALUE rbb) {
@@ -43,8 +43,7 @@ llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
 
 VALUE 
 llvm_builder_create_return(VALUE self, VALUE rv) {
-  IRBuilder<>* builder;
-  Data_Get_Struct(self, IRBuilder<>, builder);
+  DATA_GET_BUILDER
 
   Value *v;
   Data_Get_Struct(rv, Value, v);
@@ -53,8 +52,7 @@ llvm_builder_create_return(VALUE self, VALUE rv) {
 
 VALUE 
 llvm_builder_create_br(VALUE self, VALUE rblock) {
-  IRBuilder<>* builder;
-  Data_Get_Struct(self, IRBuilder<>, builder);
+  DATA_GET_BUILDER
 
   BasicBlock *bb;
   Data_Get_Struct(rblock, BasicBlock, bb);
@@ -63,8 +61,7 @@ llvm_builder_create_br(VALUE self, VALUE rblock) {
 
 VALUE 
 llvm_builder_create_cond_br(VALUE self, VALUE rcond, VALUE rtrue_block, VALUE rfalse_block) {
-  IRBuilder<>* builder;
-  Data_Get_Struct(self, IRBuilder<>, builder);
+  DATA_GET_BUILDER
 
   Value *cond;
   Data_Get_Struct(rcond, Value, cond);
@@ -76,9 +73,9 @@ llvm_builder_create_cond_br(VALUE self, VALUE rcond, VALUE rtrue_block, VALUE rf
   return llvm_value_wrap(builder->CreateCondBr(cond, true_block, false_block));
 }
   
-VALUE llvm_builder_create_alloca(VALUE self, VALUE rtype, VALUE rsize) {
-  IRBuilder<>* builder;
-  Data_Get_Struct(self, IRBuilder<>, builder);
+VALUE 
+llvm_builder_create_alloca(VALUE self, VALUE rtype, VALUE rsize) {
+  DATA_GET_BUILDER
 
   const Type* type;
   Data_Get_Struct(rtype, Type, type);
@@ -88,18 +85,18 @@ VALUE llvm_builder_create_alloca(VALUE self, VALUE rtype, VALUE rsize) {
   return llvm_value_wrap(v);
 }
 
-VALUE llvm_builder_create_load(VALUE self, VALUE rptr) {
-  IRBuilder<>* builder;
-  Data_Get_Struct(self, IRBuilder<>, builder);
+VALUE
+llvm_builder_create_load(VALUE self, VALUE rptr) {
+  DATA_GET_BUILDER
 
   Value *ptr;
   Data_Get_Struct(rptr, Value, ptr);
   return llvm_value_wrap(builder->CreateLoad(ptr));
 }
 
-VALUE llvm_builder_create_store(VALUE self, VALUE rv, VALUE rptr) {
-  IRBuilder<>* builder;
-  Data_Get_Struct(self, IRBuilder<>, builder);
+VALUE
+llvm_builder_create_store(VALUE self, VALUE rv, VALUE rptr) {
+  DATA_GET_BUILDER
 
   Value *v, *ptr;
   Data_Get_Struct(rv, Value, v);
@@ -107,9 +104,9 @@ VALUE llvm_builder_create_store(VALUE self, VALUE rv, VALUE rptr) {
   return llvm_value_wrap(builder->CreateStore(v, ptr));
 }
 
-VALUE llvm_builder_create_icmpeq(VALUE self, VALUE rlhs, VALUE rrhs) {
-  IRBuilder<>* builder; 
-  Data_Get_Struct(self, IRBuilder<>, builder);
+VALUE
+llvm_builder_create_icmpeq(VALUE self, VALUE rlhs, VALUE rrhs) {
+  DATA_GET_BUILDER
 
   Value *lhs, *rhs;
   Data_Get_Struct(rlhs, Value, lhs);
@@ -117,9 +114,9 @@ VALUE llvm_builder_create_icmpeq(VALUE self, VALUE rlhs, VALUE rrhs) {
   return llvm_value_wrap(builder->CreateICmpEQ(lhs, rhs));
 }
 
-VALUE llvm_builder_create_gep(VALUE self, VALUE rptr, VALUE ridx) {
-  IRBuilder<>* builder; 
-  Data_Get_Struct(self, IRBuilder<>, builder);
+VALUE
+llvm_builder_create_gep(VALUE self, VALUE rptr, VALUE ridx) {
+  DATA_GET_BUILDER
 
   Value *ptr, *idx;
   Data_Get_Struct(rptr, Value, ptr);
@@ -127,18 +124,18 @@ VALUE llvm_builder_create_gep(VALUE self, VALUE rptr, VALUE ridx) {
   return llvm_value_wrap(builder->CreateGEP(ptr, idx));
 }
 
-VALUE llvm_builder_create_struct_gep(VALUE self, VALUE rptr, VALUE ridx) {
-  IRBuilder<>* builder;
-  Data_Get_Struct(self, IRBuilder<>, builder);
+VALUE
+llvm_builder_create_struct_gep(VALUE self, VALUE rptr, VALUE ridx) {
+  DATA_GET_BUILDER 
 
-  Value *ptr;
+  Value *ptr; 
   Data_Get_Struct(rptr, Value, ptr);
   return llvm_value_wrap(builder->CreateStructGEP(ptr, FIX2INT(ridx)));
 }
 
-VALUE llvm_builder_create_int_to_ptr(VALUE self, VALUE ri, VALUE rtype) {
-  IRBuilder<>* builder;
-  Data_Get_Struct(self, IRBuilder<>, builder);
+VALUE
+llvm_builder_create_int_to_ptr(VALUE self, VALUE ri, VALUE rtype) {
+  DATA_GET_BUILDER
 
   Value *i;
   Data_Get_Struct(ri, Value, i);
@@ -147,5 +144,24 @@ VALUE llvm_builder_create_int_to_ptr(VALUE self, VALUE ri, VALUE rtype) {
   Data_Get_Struct(rtype, Type, type);
 
   return llvm_value_wrap(builder->CreateIntToPtr(i, type));
+}
+
+VALUE
+llvm_builder_create_call(int argc, VALUE* argv, VALUE self) {
+  DATA_GET_BUILDER
+
+  Function *callee = LLVM_FUNCTION(argv[0]);
+  int num_args = argc-1;
+  Value** args = (Value**)alloca(num_args*sizeof(Value*));
+  for(int i = 0; i < num_args; ++i) {
+    args[i] = LLVM_VAL(argv[i+1]); 
+  }
+  return llvm_value_wrap(builder->CreateCall(callee, args, args+num_args));
+}
+
+VALUE
+llvm_builder_get_global(VALUE self) {
+  GlobalVariable *g = new GlobalVariable(Type::Int64Ty, false, GlobalValue::ExternalLinkage, 0, "shakalaka");
+  return llvm_value_wrap(g);
 }
 }

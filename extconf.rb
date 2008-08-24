@@ -5,6 +5,7 @@ extension_name = 'llvmruby'
 dir_config(extension_name)
 
 have_library('stdc++')
+have_library('pthread')
 
 dir_config('llvm')
 

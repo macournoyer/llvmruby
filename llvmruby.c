@@ -14,25 +14,25 @@ VALUE cLLVMVectorType = Qnil;
 VALUE cLLVMFunctionType = Qnil;
 VALUE cLLVMInstruction = Qnil;
 VALUE cLLVMBinaryOps = Qnil;
+VALUE cLLVMPassManager = Qnil;
+VALUE cLLVMExecutionEngine = Qnil;
 
 void init_types();
 VALUE llvm_type_pointer(VALUE, VALUE);
 VALUE llvm_type_struct(VALUE, VALUE, VALUE);
 VALUE llvm_type_array(VALUE, VALUE, VALUE);
 VALUE llvm_type_vector(VALUE, VALUE, VALUE);
+VALUE llvm_type_function(VALUE, VALUE);
 
 void init_instructions();
 
 VALUE llvm_module_allocate(VALUE);
 VALUE llvm_module_initialize(VALUE); 
+VALUE llvm_module_get_or_insert_function(VALUE, VALUE);
 
 VALUE llvm_function_allocate(VALUE);
-VALUE llvm_function_initialize(VALUE, VALUE, VALUE, VALUE, VALUE);
 VALUE llvm_function_create_block(VALUE);
-VALUE llvm_function_compile(VALUE);
-VALUE llvm_function_call(VALUE, VALUE);
-VALUE llvm_function_call2(VALUE, VALUE);
-VALUE llvm_function_argument(VALUE);
+VALUE llvm_function_arguments(VALUE);
 
 VALUE llvm_basic_block_builder(VALUE);
 
@@ -49,9 +49,17 @@ VALUE llvm_builder_create_icmpeq(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_struct_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_int_to_ptr(VALUE, VALUE, VALUE);
+VALUE llvm_builder_create_call(int, VALUE*, VALUE);
+VALUE llvm_builder_get_global(VALUE);
 
 VALUE llvm_value_get_constant(VALUE);
 VALUE llvm_value_get_float_constant(VALUE);
+
+VALUE llvm_pass_manager_allocate(VALUE);
+VALUE llvm_pass_manager_initialize(VALUE);
+VALUE llvm_pass_manager_run(VALUE, VALUE);
+VALUE llvm_execution_engine_get(VALUE, VALUE);
+VALUE llvm_execution_engine_run_function(VALUE, VALUE);
 
 void Init_llvmruby() {
   cLLVMRuby = rb_define_module("LLVM");
@@ -72,27 +80,27 @@ void Init_llvmruby() {
   cLLVMInstruction = rb_define_class_under(cLLVMRuby, "Instruction", rb_cObject);
   cLLVMBinaryOps = rb_define_class_under(cLLVMInstruction, "BinaryOps", rb_cObject);
 
+  cLLVMPassManager = rb_define_class_under(cLLVMRuby, "PassManager", rb_cObject);
+  cLLVMExecutionEngine = rb_define_class_under(cLLVMRuby, "ExecutionEngine", rb_cObject);
+
   init_types();
   rb_define_module_function(cLLVMType, "pointer", llvm_type_pointer, 1);
   rb_define_module_function(cLLVMType, "struct", llvm_type_struct, 1);
   rb_define_module_function(cLLVMType, "array", llvm_type_array, 2);
   rb_define_module_function(cLLVMType, "vector", llvm_type_vector, 2);
+  rb_define_module_function(cLLVMType, "function", llvm_type_function, 2);
 
   rb_define_module_function(cLLVMValue, "get_constant", llvm_value_get_constant, 1);
   rb_define_module_function(cLLVMValue, "get_float_constant", llvm_value_get_float_constant, 1);
 
   init_instructions();
 
-  rb_define_alloc_func(cLLVMModule, llvm_module_allocate);
-  rb_define_method(cLLVMModule, "initialize", llvm_module_initialize, 0);
+  rb_define_alloc_func(cLLVMModule, llvm_module_allocate); 
+  rb_define_method(cLLVMModule, "initialize", llvm_module_initialize, 1);
+  rb_define_method(cLLVMModule, "get_or_insert_function", llvm_module_get_or_insert_function, 2);
 
-  rb_define_alloc_func(cLLVMFunction, llvm_function_allocate);
-  rb_define_method(cLLVMFunction, "initialize", llvm_function_initialize, 3);
   rb_define_method(cLLVMFunction, "create_block", llvm_function_create_block, 0);
-  rb_define_method(cLLVMFunction, "compile", llvm_function_compile, 0);
-  rb_define_method(cLLVMFunction, "call", llvm_function_call, 1);
-  rb_define_method(cLLVMFunction, "call2", llvm_function_call2, 1);
-  rb_define_method(cLLVMFunction, "argument", llvm_function_argument, 0);
+  rb_define_method(cLLVMFunction, "arguments", llvm_function_arguments, 0);
 
   rb_define_method(cLLVMBasicBlock, "builder", llvm_basic_block_builder, 0);
 
@@ -108,6 +116,15 @@ void Init_llvmruby() {
   rb_define_method(cLLVMBuilder, "create_gep", llvm_builder_create_gep, 2);
   rb_define_method(cLLVMBuilder, "create_struct_gep", llvm_builder_create_struct_gep, 2);
   rb_define_method(cLLVMBuilder, "create_int_to_ptr", llvm_builder_create_int_to_ptr, 2);
+  rb_define_method(cLLVMBuilder, "create_call", llvm_builder_create_call, -1);
+  rb_define_method(cLLVMBuilder, "get_global", llvm_builder_get_global, 0);
+
+  rb_define_alloc_func(cLLVMModule, llvm_pass_manager_allocate);
+  rb_define_method(cLLVMPassManager, "initialize", llvm_pass_manager_initialize, 0);
+  rb_define_method(cLLVMPassManager, "run", llvm_pass_manager_run, 1);
+
+  rb_define_module_function(cLLVMExecutionEngine, "get", llvm_execution_engine_get, 1);
+  rb_define_module_function(cLLVMExecutionEngine, "run_function", llvm_execution_engine_run_function, 2);
 
   //printf("sizeof long: %d\n", (int)sizeof(long));
   //printf("sizeof ptr: %d\n", (int)sizeof(long*));

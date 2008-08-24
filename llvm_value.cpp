@@ -1,12 +1,5 @@
 #include "llvmruby.h"
 
-extern VALUE cLLVMType;
-extern VALUE cLLVMPointerType;
-extern VALUE cLLVMStructType;
-extern VALUE cLLVMArrayType;
-extern VALUE cLLVMVectorType;
-extern VALUE cLLVMValue;
-
 extern "C" {
 VALUE llvm_value_wrap(Value* v) { 
   return Data_Wrap_Struct(cLLVMValue, NULL, NULL, v); 
@@ -27,7 +20,8 @@ VALUE llvm_type_pointer(VALUE self, VALUE rtype) {
   return Data_Wrap_Struct(cLLVMPointerType, NULL, NULL, ptr_type);
 }
 
-VALUE llvm_type_struct(VALUE self, VALUE rtypes, VALUE rpacked) {
+VALUE 
+llvm_type_struct(VALUE self, VALUE rtypes, VALUE rpacked) {
   std::vector<const Type*> types;
 
   for(int i = 0; i < RARRAY_LEN(rtypes); ++i) {
@@ -40,18 +34,32 @@ VALUE llvm_type_struct(VALUE self, VALUE rtypes, VALUE rpacked) {
   return Data_Wrap_Struct(cLLVMStructType, NULL, NULL, s);
 }
 
-VALUE llvm_type_array(VALUE self, VALUE rtype, VALUE size) {
+VALUE 
+llvm_type_array(VALUE self, VALUE rtype, VALUE size) {
   Type *type;
   Data_Get_Struct(rtype, Type, type);
   type = ArrayType::get(type, FIX2INT(size)); 
   return Data_Wrap_Struct(cLLVMArrayType, NULL, NULL, type);
 }
 
-VALUE llvm_type_vector(VALUE self, VALUE rtype, VALUE size) {
+VALUE 
+llvm_type_vector(VALUE self, VALUE rtype, VALUE size) {
   Type *type;
   Data_Get_Struct(rtype, Type, type);
   type = ArrayType::get(type, FIX2INT(size));
   return Data_Wrap_Struct(cLLVMVectorType, NULL, NULL, type);
+}
+
+VALUE
+llvm_type_function(VALUE self, VALUE rret_type, VALUE rarg_types) {
+  std::vector<const Type*> arg_types;
+  for(int i = 0; i < RARRAY_LEN(rarg_types); ++i) {
+    VALUE v = RARRAY_PTR(rarg_types)[i];
+    arg_types.push_back(LLVM_TYPE(v));
+  }
+  const Type *ret_type = LLVM_TYPE(rret_type);
+  FunctionType *ftype = FunctionType::get(ret_type, arg_types, false);
+  return Data_Wrap_Struct(cLLVMFunctionType, NULL, NULL, ftype);
 }
 
 void init_types() {
