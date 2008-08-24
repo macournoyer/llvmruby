@@ -35,14 +35,6 @@ extern VALUE cLLVMInstruction;
 extern VALUE cLLVMBinaryOps;
 extern VALUE cLLVMPassManager;
 
-/*
-typedef struct {
-  Module *M;
-  Function* F;
-  long(*FP)(long);
-} llvm_function_t;
-*/
-
 #define LLVM_VAL(obj) ((Value*)DATA_PTR(obj))
 #define LLVM_TYPE(obj) ((Type*)DATA_PTR(obj))
 #define LLVM_FUNC_TYPE(obj) ((FunctionType*)DATA_PTR(obj))
