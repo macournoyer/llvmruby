@@ -13,6 +13,7 @@ VALUE cLLVMArrayType = Qnil;
 VALUE cLLVMVectorType = Qnil;
 VALUE cLLVMFunctionType = Qnil;
 VALUE cLLVMInstruction = Qnil;
+VALUE cLLVMPhi = Qnil;
 VALUE cLLVMBinaryOps = Qnil;
 VALUE cLLVMPassManager = Qnil;
 VALUE cLLVMExecutionEngine = Qnil;
@@ -38,6 +39,7 @@ VALUE llvm_basic_block_builder(VALUE);
 
 VALUE llvm_builder_set_insert_point(VALUE, VALUE);
 VALUE llvm_builder_bin_op(VALUE, VALUE, VALUE, VALUE);
+VALUE llvm_builder_create_phi(VALUE, VALUE);
 VALUE llvm_builder_create_return(VALUE, VALUE);
 VALUE llvm_builder_create_br(VALUE, VALUE);
 VALUE llvm_builder_create_cond_br(VALUE, VALUE, VALUE, VALUE);
@@ -46,6 +48,7 @@ VALUE llvm_builder_create_alloca(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_load(VALUE, VALUE);
 VALUE llvm_builder_create_store(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_icmpeq(VALUE, VALUE, VALUE);
+VALUE llvm_builder_create_icmpult(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_struct_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_int_to_ptr(VALUE, VALUE, VALUE);
@@ -54,6 +57,8 @@ VALUE llvm_builder_get_global(VALUE);
 
 VALUE llvm_value_get_constant(VALUE);
 VALUE llvm_value_get_float_constant(VALUE);
+
+VALUE llvm_phi_add_incoming(VALUE, VALUE, VALUE);
 
 VALUE llvm_pass_manager_allocate(VALUE);
 VALUE llvm_pass_manager_initialize(VALUE);
@@ -79,6 +84,7 @@ void Init_llvmruby() {
 
   cLLVMInstruction = rb_define_class_under(cLLVMRuby, "Instruction", rb_cObject);
   cLLVMBinaryOps = rb_define_class_under(cLLVMInstruction, "BinaryOps", rb_cObject);
+  cLLVMPhi = rb_define_class_under(cLLVMRuby, "Phi", cLLVMValue);
 
   cLLVMPassManager = rb_define_class_under(cLLVMRuby, "PassManager", rb_cObject);
   cLLVMExecutionEngine = rb_define_class_under(cLLVMRuby, "ExecutionEngine", rb_cObject);
@@ -106,6 +112,7 @@ void Init_llvmruby() {
 
   rb_define_method(cLLVMBuilder, "set_insert_point", llvm_builder_set_insert_point, 1);
   rb_define_method(cLLVMBuilder, "bin_op", llvm_builder_bin_op, 3);
+  rb_define_method(cLLVMBuilder, "create_phi", llvm_builder_create_phi, 1);
   rb_define_method(cLLVMBuilder, "create_return", llvm_builder_create_return, 1);
   rb_define_method(cLLVMBuilder, "create_br", llvm_builder_create_br, 1);
   rb_define_method(cLLVMBuilder, "create_cond_br", llvm_builder_create_cond_br, 3);
@@ -113,11 +120,15 @@ void Init_llvmruby() {
   rb_define_method(cLLVMBuilder, "create_load", llvm_builder_create_load, 1);
   rb_define_method(cLLVMBuilder, "create_store", llvm_builder_create_store, 2);
   rb_define_method(cLLVMBuilder, "create_icmpeq", llvm_builder_create_icmpeq, 2);
+  rb_define_method(cLLVMBuilder, "create_icmpult", llvm_builder_create_icmpult, 2);
+
   rb_define_method(cLLVMBuilder, "create_gep", llvm_builder_create_gep, 2);
   rb_define_method(cLLVMBuilder, "create_struct_gep", llvm_builder_create_struct_gep, 2);
   rb_define_method(cLLVMBuilder, "create_int_to_ptr", llvm_builder_create_int_to_ptr, 2);
   rb_define_method(cLLVMBuilder, "create_call", llvm_builder_create_call, -1);
   rb_define_method(cLLVMBuilder, "get_global", llvm_builder_get_global, 0);
+
+  rb_define_method(cLLVMPhi, "add_incoming", llvm_phi_add_incoming, 2);
 
   rb_define_alloc_func(cLLVMModule, llvm_pass_manager_allocate);
   rb_define_method(cLLVMPassManager, "initialize", llvm_pass_manager_initialize, 0);

@@ -33,6 +33,7 @@ extern VALUE cLLVMVectorType;
 extern VALUE cLLVMFunctionType;
 extern VALUE cLLVMInstruction;
 extern VALUE cLLVMBinaryOps;
+extern VALUE cLLVMPhi;
 extern VALUE cLLVMPassManager;
 
 #define LLVM_VAL(obj) ((Value*)DATA_PTR(obj))
@@ -40,6 +41,8 @@ extern VALUE cLLVMPassManager;
 #define LLVM_FUNC_TYPE(obj) ((FunctionType*)DATA_PTR(obj))
 #define LLVM_MODULE(obj) ((Module*)DATA_PTR(obj))
 #define LLVM_FUNCTION(obj) ((Function*)DATA_PTR(obj))
+#define LLVM_BASIC_BLOCK(obj) ((BasicBlock*)DATA_PTR(obj))
+#define LLVM_PHI(obj) ((PHINode*)DATA_PTR(obj))
 
 extern "C" {
 VALUE llvm_value_wrap(Value*);

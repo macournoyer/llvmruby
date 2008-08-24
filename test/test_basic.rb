@@ -111,8 +111,37 @@ class BasicTests < Test::Unit::TestCase
     ret = b.create_call(f_callee, 2.llvm, 3.llvm)
     b.create_return(ret)
 
-    result = ExecutionEngine.get(m)
-    assert(5, result)
+    ExecutionEngine.get(m)
+    result = ExecutionEngine.run_function(f_caller, nil)
+    assert_equal(5, result)
+  end
+
+  def test_phi_node
+    m = LLVM::Module.new("test_module")
+    type = Type::function(Type::Int64Ty, [])
+    f = m.get_or_insert_function("phi_node", type)
+
+    entry_block = f.create_block
+    loop_block = f.create_block
+    exit_block = f.create_block
+
+    b = entry_block.builder
+    b.create_br(loop_block)
+
+    b = loop_block.builder
+    phi = b.create_phi(Type::Int64Ty)
+    phi.add_incoming(0.llvm, entry_block)
+    count = b.add(phi, 1.llvm)
+    phi.add_incoming(count, loop_block)
+    cmp = b.create_icmpult(count, 10.llvm)
+    b.create_cond_br(cmp, loop_block, exit_block)
+
+    b = exit_block.builder
+    b.create_return(phi)
+
+    ExecutionEngine.get(m)
+    result = ExecutionEngine.run_function(f, nil)
+    assert_equal(9, result)
   end
 
   #def test_get_global

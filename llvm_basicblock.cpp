@@ -41,6 +41,20 @@ llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
   return llvm_value_wrap(res);
 }
 
+VALUE
+llvm_builder_create_phi(VALUE self, VALUE type) {
+  DATA_GET_BUILDER
+  PHINode *v = builder->CreatePHI(LLVM_TYPE(type)); 
+  return Data_Wrap_Struct(cLLVMPhi, NULL, NULL, v);
+}
+
+VALUE
+llvm_phi_add_incoming(VALUE self, VALUE val, VALUE block) {
+  PHINode *phi = LLVM_PHI(self);
+  phi->addIncoming(LLVM_VAL(val), LLVM_BASIC_BLOCK(block));
+  return self;
+}
+
 VALUE 
 llvm_builder_create_return(VALUE self, VALUE rv) {
   DATA_GET_BUILDER
@@ -112,6 +126,16 @@ llvm_builder_create_icmpeq(VALUE self, VALUE rlhs, VALUE rrhs) {
   Data_Get_Struct(rlhs, Value, lhs);
   Data_Get_Struct(rrhs, Value, rhs);
   return llvm_value_wrap(builder->CreateICmpEQ(lhs, rhs));
+}
+
+VALUE
+llvm_builder_create_icmpult(VALUE self, VALUE rlhs, VALUE rrhs) {
+  DATA_GET_BUILDER
+
+  Value *lhs, *rhs;
+  Data_Get_Struct(rlhs, Value, lhs);
+  Data_Get_Struct(rrhs, Value, rhs);
+  return llvm_value_wrap(builder->CreateICmpULT(lhs, rhs));
 }
 
 VALUE
