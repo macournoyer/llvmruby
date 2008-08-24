@@ -58,6 +58,14 @@ VALUE
 llvm_execution_engine_get(VALUE klass, VALUE module) {
   Module *m = LLVM_MODULE(module);
   ExistingModuleProvider *MP = new ExistingModuleProvider(m);
+
+  GlobalVariable *ruby_bindings = new GlobalVariable(
+      Type::Int64Ty,
+      false,
+      GlobalValue::InternalLinkage,
+      ConstantInt::get(Type::Int64Ty, 666),
+      "ruby_bindings",
+      m);
  
   if(EE == NULL) {
     EE = ExecutionEngine::create(MP, false);
@@ -78,7 +86,7 @@ llvm_execution_engine_run_function(VALUE klass, VALUE func, VALUE arg) {
   }
 
   GenericValue v = EE->runFunction(LLVM_FUNCTION(func), arg_values);
-  int val = v.IntVal.getSExtValue();
+  VALUE val = v.IntVal.getZExtValue();
 
   // For now, nil args means test functions that want automatic conversion to fixnum
   if(arg == Qnil) {  

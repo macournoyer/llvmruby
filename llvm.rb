@@ -12,6 +12,12 @@ class Float
   end
 end
 
+class LLVM::Value
+  def llvm
+    self
+  end
+end
+
 def testf
   Function.new('shaka', Type::Int32Ty, [Type::Int32Ty])
 end
@@ -30,6 +36,63 @@ module LLVM
 
     def write(&b)
       instance_eval(&b)
+    end
+  end
+
+  # include this into the builder to get methods for manipulating ruby values
+  module RubyHelpers
+    FIXNUM_FLAG = 0x1.llvm
+    CHAR = Type::Int8Ty
+    P_CHAR = Type::pointer(CHAR)
+    LONG = Type::Int64Ty
+    VALUE = Type::Int64Ty
+    P_VALUE = Type::pointer(VALUE)
+    RBASIC = Type::struct([VALUE, VALUE])
+    RARRAY = Type::struct([RBASIC, LONG, LONG, P_VALUE])
+    P_RARRAY = Type::pointer(RARRAY)
+    RSTRING = Type::struct([RBASIC, LONG, P_CHAR, VALUE])
+    P_RSTRING = Type::pointer(RSTRING)
+
+    def fixnum?(val)
+      self.and(FIXNUM_FLAG, val)
+    end
+
+    def num2fix(val)
+      shifted = shl(val, 1.llvm)
+      xor(FIXNUM_FLAG, shifted)
+    end
+
+    def fix2int(val)
+      x = xor(FIXNUM_FLAG, val)
+      lshr(val, 1.llvm)
+    end
+
+    def slen(str)
+      val_ptr = create_int_to_ptr(str, P_RSTRING)
+      len_ptr = create_struct_gep(val_ptr, 1)
+      create_load(len_ptr)
+    end
+
+    def alen(ary)
+      val_ptr = create_int_to_ptr(ary, P_RARRAY)
+      len_ptr = create_struct_gep(val_ptr, 1)
+      create_load(len_ptr)
+    end
+
+    def aref(ary, idx)
+      val_ptr = create_int_to_ptr(ary, P_RARRAY)
+      data_ptr = create_struct_gep(val_ptr, 3)
+      data_ptr = create_load(data_ptr)
+      slot_n = create_gep(data_ptr, idx.llvm)
+      create_load(slot_n)
+    end
+
+    def aset(ary, idx, set)
+      val_ptr = create_int_to_ptr(ary, P_RARRAY)
+      data_ptr = create_struct_gep(val_ptr, 3)
+      data_ptr = create_load(data_ptr)
+      slot_n = create_gep(data_ptr, idx.llvm)
+      create_store(set, slot_n)
     end
   end
 end
