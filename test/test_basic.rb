@@ -10,7 +10,7 @@ class BasicTests < Test::Unit::TestCase
     f = m.get_or_insert_function("test", type)
     yield(f)
     ExecutionEngine.get(m);
-    assert_equal(expected, ExecutionEngine.run_function(f, nil))
+    assert_equal(expected, ExecutionEngine.run_autoconvert(f))
   end
 
   def test_module
@@ -112,7 +112,7 @@ class BasicTests < Test::Unit::TestCase
     b.create_return(ret)
 
     ExecutionEngine.get(m)
-    result = ExecutionEngine.run_function(f_caller, nil)
+    result = ExecutionEngine.run_autoconvert(f_caller)
     assert_equal(5, result)
   end
 
@@ -140,7 +140,7 @@ class BasicTests < Test::Unit::TestCase
     b.create_return(phi)
 
     ExecutionEngine.get(m)
-    result = ExecutionEngine.run_function(f, nil)
+    result = ExecutionEngine.run_autoconvert(f)
     assert_equal(9, result)
   end
 

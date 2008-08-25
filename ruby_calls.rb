@@ -1,5 +1,6 @@
 require 'llvm'
 include LLVM
+include RubyInternals
 
 class Builder
   include RubyHelpers
@@ -8,15 +9,33 @@ end
 m = LLVM::Module.new('ruby_bindings_examples')
 ExecutionEngine.get(m)
 
-type = Type.function(Type::Int64Ty, [Type::Int64Ty])
-f = m.get_or_insert_function('new_array', type)
+def ftype(ret_type, arg_types)
+  Type.function(ret_type, arg_types)
+end
+
+rb_ary_new = m.external_function('rb_ary_new', ftype(VALUE, []))
+rb_to_id = m.external_function('rb_to_id', ftype(VALUE, [VALUE]))
+rb_ivar_get = m.external_function('rb_ivar_get', ftype(VALUE, [VALUE, ID]))
+
+class TestClass
+  def initialize
+    @shaka = 'khan'
+  end
+end
+
+test_instance = TestClass.new
+
+# take a class and an instance variable symbol, return value of instance variable
+type = Type.function(VALUE, [VALUE, VALUE])
+f = m.get_or_insert_function('shakula', type)
+obj, ivar_sym = f.arguments
 b = f.create_block.builder
-ftype = Type.function(Type::Int64Ty, [])
-rb_ary_new = m.external_function('rb_ary_new', ftype)
 new_ary = b.create_call(rb_ary_new)
-b.create_return(new_ary)
-ret = ExecutionEngine.run_function(f, 0)
-puts "new array: #{ret.inspect}"
+ivar_id = b.create_call(rb_to_id, ivar_sym)
+ret_val = b.create_call(rb_ivar_get, obj, ivar_id)
+b.create_return(ret_val)
+ret = ExecutionEngine.run_function(f, test_instance, :@shaka)
+puts "get instance variable @shaka: #{ret.inspect}"
 
 # Return the last element of an array
 type = Type.function(Type::Int64Ty, [Type::Int64Ty])
@@ -74,7 +93,7 @@ b = exit_block.builder
 b.create_return(ary)
 add1 = f
 
-ret = ExecutionEngine.run_function(add1, [1,2,3,4,23])
+ret = ExecutionEngine.run_function(add1, [1,2,3,4,5])
 puts "add1: #{ret.inspect}"
 
 # Add 1 to every array element (in place)

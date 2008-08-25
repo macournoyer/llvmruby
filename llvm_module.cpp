@@ -81,26 +81,34 @@ llvm_module_external_function(VALUE self, VALUE name, VALUE type) {
 }
 
 VALUE
-llvm_execution_engine_run_function(VALUE klass, VALUE func, VALUE arg) {
-  // Using run function is much slower thatn getting C function pointer
+llvm_execution_engine_run_function(int argc, VALUE *argv, VALUE klass) {
+  // Using run function is much slower than getting C function pointer
   // and calling that, but it lets us pass in arbitrary numbers of
   // arguments easily for now, which is nice
   std::vector<GenericValue> arg_values;
-
-  if(arg != Qnil) {
+  for(int i = 1; i < argc; ++i) {
     GenericValue arg_val;
-    arg_val.IntVal = APInt(64, arg);
+    arg_val.IntVal = APInt(64, argv[i]);
     arg_values.push_back(arg_val);
   }
 
-  GenericValue v = EE->runFunction(LLVM_FUNCTION(func), arg_values);
+  GenericValue v = EE->runFunction(LLVM_FUNCTION(argv[0]), arg_values);
   VALUE val = v.IntVal.getZExtValue();
 
-  // For now, nil args means test functions that want automatic conversion to fixnum
+  /*
   if(arg == Qnil) {  
     val = INT2NUM(val);
   }
+  */
 
+  return val;
+}
+
+/* For tests: assume no args, return uncoverted int and turn it into fixnum */
+VALUE llvm_execution_engine_run_autoconvert(VALUE klass, VALUE func) {
+  std::vector<GenericValue> args;
+  GenericValue v = EE->runFunction(LLVM_FUNCTION(func), args);
+  VALUE val = INT2NUM(v.IntVal.getZExtValue());
   return val;
 }
 }

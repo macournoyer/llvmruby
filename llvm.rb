@@ -39,19 +39,25 @@ module LLVM
     end
   end
 
-  # include this into the builder to get methods for manipulating ruby values
-  module RubyHelpers
+  # describe structures used by the ruby 1.8/1.9 interpreters
+  module RubyInternals
     FIXNUM_FLAG = 0x1.llvm
     CHAR = Type::Int8Ty
     P_CHAR = Type::pointer(CHAR)
     LONG = Type::Int64Ty
     VALUE = Type::Int64Ty
     P_VALUE = Type::pointer(VALUE)
+    ID = Type::Int64Ty
     RBASIC = Type::struct([VALUE, VALUE])
     RARRAY = Type::struct([RBASIC, LONG, LONG, P_VALUE])
     P_RARRAY = Type::pointer(RARRAY)
     RSTRING = Type::struct([RBASIC, LONG, P_CHAR, VALUE])
     P_RSTRING = Type::pointer(RSTRING)
+  end
+
+  # include this into the builder to get methods for manipulating ruby values
+  module RubyHelpers
+    include RubyInternals
 
     def fixnum?(val)
       self.and(FIXNUM_FLAG, val)
