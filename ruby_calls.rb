@@ -16,6 +16,7 @@ end
 rb_ary_new = m.external_function('rb_ary_new', ftype(VALUE, []))
 rb_to_id = m.external_function('rb_to_id', ftype(VALUE, [VALUE]))
 rb_ivar_get = m.external_function('rb_ivar_get', ftype(VALUE, [VALUE, ID]))
+rb_ivar_set = m.external_function('rb_ivar_set', ftype(VALUE, [VALUE, ID, VALUE]))
 
 class TestClass
   def initialize
@@ -25,7 +26,7 @@ end
 
 test_instance = TestClass.new
 
-# take a class and an instance variable symbol, return value of instance variable
+# take an object and an instance variable symbol, return value of instance variable
 type = Type.function(VALUE, [VALUE, VALUE])
 f = m.get_or_insert_function('shakula', type)
 obj, ivar_sym = f.arguments

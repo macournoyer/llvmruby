@@ -50,6 +50,7 @@ VALUE llvm_builder_create_load(VALUE, VALUE);
 VALUE llvm_builder_create_store(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_icmpeq(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_icmpult(VALUE, VALUE, VALUE);
+VALUE llvm_builder_create_icmp(VALUE, VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_struct_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_int_to_ptr(VALUE, VALUE, VALUE);
@@ -125,6 +126,7 @@ void Init_llvmruby() {
   rb_define_method(cLLVMBuilder, "create_store", llvm_builder_create_store, 2);
   rb_define_method(cLLVMBuilder, "create_icmpeq", llvm_builder_create_icmpeq, 2);
   rb_define_method(cLLVMBuilder, "create_icmpult", llvm_builder_create_icmpult, 2);
+  rb_define_method(cLLVMBuilder, "create_icmp", llvm_builder_create_icmp, 3);
 
   rb_define_method(cLLVMBuilder, "create_gep", llvm_builder_create_gep, 2);
   rb_define_method(cLLVMBuilder, "create_struct_gep", llvm_builder_create_struct_gep, 2);

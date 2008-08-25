@@ -139,6 +139,15 @@ llvm_builder_create_icmpult(VALUE self, VALUE rlhs, VALUE rrhs) {
 }
 
 VALUE
+llvm_builder_create_icmp(VALUE self, VALUE pred, VALUE rhs, VALUE lhs) {
+  DATA_GET_BUILDER
+
+  CmpInst::Predicate p = (CmpInst::Predicate)FIX2INT(pred);
+  Value *v = builder->CreateICmp(p, LLVM_VAL(rhs), LLVM_VAL(lhs));
+  return llvm_value_wrap(v);
+}
+
+VALUE
 llvm_builder_create_gep(VALUE self, VALUE rptr, VALUE ridx) {
   DATA_GET_BUILDER
 
