@@ -170,6 +170,12 @@ llvm_builder_create_int_to_ptr(VALUE self, VALUE ri, VALUE rtype) {
   return llvm_value_wrap(builder->CreateIntToPtr(i, type));
 }
 
+VALUE llvm_builder_create_int_cast(VALUE self, VALUE i, VALUE type, VALUE sign) {
+  DATA_GET_BUILDER
+  bool isSigned = (sign != Qnil && sign != Qfalse);
+  return llvm_value_wrap(builder->CreateIntCast(LLVM_VAL(i), LLVM_TYPE(type), isSigned));
+}
+
 VALUE
 llvm_builder_create_call(int argc, VALUE* argv, VALUE self) {
   DATA_GET_BUILDER

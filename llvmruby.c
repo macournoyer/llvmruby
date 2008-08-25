@@ -30,6 +30,7 @@ void init_instructions();
 VALUE llvm_module_allocate(VALUE);
 VALUE llvm_module_initialize(VALUE); 
 VALUE llvm_module_get_or_insert_function(VALUE, VALUE);
+VALUE llvm_module_external_function(VALUE, VALUE, VALUE);
 
 VALUE llvm_function_allocate(VALUE);
 VALUE llvm_function_create_block(VALUE);
@@ -52,6 +53,7 @@ VALUE llvm_builder_create_icmpult(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_struct_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_int_to_ptr(VALUE, VALUE, VALUE);
+VALUE llvm_builder_create_int_cast(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_call(int, VALUE*, VALUE);
 VALUE llvm_builder_get_global(VALUE);
 
@@ -104,6 +106,7 @@ void Init_llvmruby() {
   rb_define_alloc_func(cLLVMModule, llvm_module_allocate); 
   rb_define_method(cLLVMModule, "initialize", llvm_module_initialize, 1);
   rb_define_method(cLLVMModule, "get_or_insert_function", llvm_module_get_or_insert_function, 2);
+  rb_define_method(cLLVMModule, "external_function", llvm_module_external_function, 2);
 
   rb_define_method(cLLVMFunction, "create_block", llvm_function_create_block, 0);
   rb_define_method(cLLVMFunction, "arguments", llvm_function_arguments, 0);
@@ -125,6 +128,7 @@ void Init_llvmruby() {
   rb_define_method(cLLVMBuilder, "create_gep", llvm_builder_create_gep, 2);
   rb_define_method(cLLVMBuilder, "create_struct_gep", llvm_builder_create_struct_gep, 2);
   rb_define_method(cLLVMBuilder, "create_int_to_ptr", llvm_builder_create_int_to_ptr, 2);
+  rb_define_method(cLLVMBuilder, "create_int_cast", llvm_builder_create_int_cast, 3);
   rb_define_method(cLLVMBuilder, "create_call", llvm_builder_create_call, -1);
   rb_define_method(cLLVMBuilder, "get_global", llvm_builder_get_global, 0);
 

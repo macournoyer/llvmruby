@@ -54,29 +54,41 @@ llvm_pass_manager_run(VALUE self, VALUE module) {
 
 static ExecutionEngine *EE = NULL;
 
+void shaka() {
+  printf("omg you called me!\n");
+}
+
 VALUE
 llvm_execution_engine_get(VALUE klass, VALUE module) {
   Module *m = LLVM_MODULE(module);
   ExistingModuleProvider *MP = new ExistingModuleProvider(m);
 
-  GlobalVariable *ruby_bindings = new GlobalVariable(
-      Type::Int64Ty,
-      false,
-      GlobalValue::InternalLinkage,
-      ConstantInt::get(Type::Int64Ty, 666),
-      "ruby_bindings",
-      m);
- 
   if(EE == NULL) {
     EE = ExecutionEngine::create(MP, false);
   } else {
     EE->addModuleProvider(MP);
   }
+
   return Qtrue;
 }
 
 VALUE
+llvm_module_external_function(VALUE self, VALUE name, VALUE type) {
+  Module *module = LLVM_MODULE(self);
+  Function *f = Function::Create(
+    LLVM_FUNC_TYPE(type), 
+    Function::ExternalLinkage, 
+    StringValuePtr(name),
+    module
+  );
+  return Data_Wrap_Struct(cLLVMFunction, NULL, NULL, f);
+}
+
+VALUE
 llvm_execution_engine_run_function(VALUE klass, VALUE func, VALUE arg) {
+  // Using run function is much slower thatn getting C function pointer
+  // and calling that, but it lets us pass in arbitrary numbers of
+  // arguments easily for now, which is nice
   std::vector<GenericValue> arg_values;
 
   if(arg != Qnil) {
