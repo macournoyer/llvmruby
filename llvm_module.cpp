@@ -54,10 +54,6 @@ llvm_pass_manager_run(VALUE self, VALUE module) {
 
 static ExecutionEngine *EE = NULL;
 
-void shaka() {
-  printf("omg you called me!\n");
-}
-
 VALUE
 llvm_execution_engine_get(VALUE klass, VALUE module) {
   Module *m = LLVM_MODULE(module);
