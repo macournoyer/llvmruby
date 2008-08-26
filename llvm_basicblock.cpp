@@ -42,7 +42,7 @@ llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
 }
 
 VALUE
-llvm_builder_create_phi(VALUE self, VALUE type) {
+llvm_builder_phi(VALUE self, VALUE type) {
   DATA_GET_BUILDER
   PHINode *v = builder->CreatePHI(LLVM_TYPE(type)); 
   return Data_Wrap_Struct(cLLVMPhi, NULL, NULL, v);
@@ -56,7 +56,7 @@ llvm_phi_add_incoming(VALUE self, VALUE val, VALUE block) {
 }
 
 VALUE 
-llvm_builder_create_return(VALUE self, VALUE rv) {
+llvm_builder_return(VALUE self, VALUE rv) {
   DATA_GET_BUILDER
 
   Value *v;
@@ -65,7 +65,7 @@ llvm_builder_create_return(VALUE self, VALUE rv) {
 }
 
 VALUE 
-llvm_builder_create_br(VALUE self, VALUE rblock) {
+llvm_builder_br(VALUE self, VALUE rblock) {
   DATA_GET_BUILDER
 
   BasicBlock *bb;
@@ -74,7 +74,7 @@ llvm_builder_create_br(VALUE self, VALUE rblock) {
 }  
 
 VALUE 
-llvm_builder_create_cond_br(VALUE self, VALUE rcond, VALUE rtrue_block, VALUE rfalse_block) {
+llvm_builder_cond_br(VALUE self, VALUE rcond, VALUE rtrue_block, VALUE rfalse_block) {
   DATA_GET_BUILDER
 
   Value *cond;
@@ -88,7 +88,7 @@ llvm_builder_create_cond_br(VALUE self, VALUE rcond, VALUE rtrue_block, VALUE rf
 }
   
 VALUE 
-llvm_builder_create_alloca(VALUE self, VALUE rtype, VALUE rsize) {
+llvm_builder_alloca(VALUE self, VALUE rtype, VALUE rsize) {
   DATA_GET_BUILDER
 
   const Type* type;
@@ -100,7 +100,7 @@ llvm_builder_create_alloca(VALUE self, VALUE rtype, VALUE rsize) {
 }
 
 VALUE
-llvm_builder_create_load(VALUE self, VALUE rptr) {
+llvm_builder_load(VALUE self, VALUE rptr) {
   DATA_GET_BUILDER
 
   Value *ptr;
@@ -109,7 +109,7 @@ llvm_builder_create_load(VALUE self, VALUE rptr) {
 }
 
 VALUE
-llvm_builder_create_store(VALUE self, VALUE rv, VALUE rptr) {
+llvm_builder_store(VALUE self, VALUE rv, VALUE rptr) {
   DATA_GET_BUILDER
 
   Value *v, *ptr;
@@ -119,7 +119,7 @@ llvm_builder_create_store(VALUE self, VALUE rv, VALUE rptr) {
 }
 
 VALUE
-llvm_builder_create_icmp(VALUE self, VALUE pred, VALUE lhs, VALUE rhs) {
+llvm_builder_icmp(VALUE self, VALUE pred, VALUE lhs, VALUE rhs) {
   DATA_GET_BUILDER
 
   CmpInst::Predicate p = (CmpInst::Predicate)FIX2INT(pred);
@@ -128,7 +128,7 @@ llvm_builder_create_icmp(VALUE self, VALUE pred, VALUE lhs, VALUE rhs) {
 }
 
 VALUE
-llvm_builder_create_gep(VALUE self, VALUE rptr, VALUE ridx) {
+llvm_builder_gep(VALUE self, VALUE rptr, VALUE ridx) {
   DATA_GET_BUILDER
 
   Value *ptr, *idx;
@@ -138,7 +138,7 @@ llvm_builder_create_gep(VALUE self, VALUE rptr, VALUE ridx) {
 }
 
 VALUE
-llvm_builder_create_struct_gep(VALUE self, VALUE rptr, VALUE ridx) {
+llvm_builder_struct_gep(VALUE self, VALUE rptr, VALUE ridx) {
   DATA_GET_BUILDER 
 
   Value *ptr; 
@@ -147,7 +147,7 @@ llvm_builder_create_struct_gep(VALUE self, VALUE rptr, VALUE ridx) {
 }
 
 VALUE
-llvm_builder_create_int_to_ptr(VALUE self, VALUE ri, VALUE rtype) {
+llvm_builder_int_to_ptr(VALUE self, VALUE ri, VALUE rtype) {
   DATA_GET_BUILDER
 
   Value *i;
@@ -159,14 +159,14 @@ llvm_builder_create_int_to_ptr(VALUE self, VALUE ri, VALUE rtype) {
   return llvm_value_wrap(builder->CreateIntToPtr(i, type));
 }
 
-VALUE llvm_builder_create_int_cast(VALUE self, VALUE i, VALUE type, VALUE sign) {
+VALUE llvm_builder_int_cast(VALUE self, VALUE i, VALUE type, VALUE sign) {
   DATA_GET_BUILDER
   bool isSigned = (sign != Qnil && sign != Qfalse);
   return llvm_value_wrap(builder->CreateIntCast(LLVM_VAL(i), LLVM_TYPE(type), isSigned));
 }
 
 VALUE
-llvm_builder_create_call(int argc, VALUE* argv, VALUE self) {
+llvm_builder_call(int argc, VALUE* argv, VALUE self) {
   DATA_GET_BUILDER
 
   Function *callee = LLVM_FUNCTION(argv[0]);

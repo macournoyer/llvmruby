@@ -17,7 +17,7 @@ class BasicTests < Test::Unit::TestCase
     function_tester(5) do |f|
       b = f.create_block.builder
       v = b.add(2.llvm, 3.llvm)
-      b.create_return(v)
+      b.return(v)
     end
   end
 
@@ -25,7 +25,7 @@ class BasicTests < Test::Unit::TestCase
     function_tester(expected) do |f|
       b = f.create_block.builder 
       ret = b.bin_op(op, v1.llvm, v2.llvm)
-      b.create_return(ret)
+      b.return(ret)
     end
   end
 
@@ -52,7 +52,7 @@ class BasicTests < Test::Unit::TestCase
     function_tester(expected) do |f|
       b = f.create_block.builder
       ret = b.send(op, v1.llvm, v2.llvm)
-      b.create_return(ret)
+      b.return(ret)
     end
   end
 
@@ -79,9 +79,9 @@ class BasicTests < Test::Unit::TestCase
       b1 = f.create_block
       b2 = f.create_block
       builder = b1.builder
-      builder.create_br(b2)
+      builder.br(b2)
       builder.set_insert_point(b2)
-      builder.create_return(2.llvm)
+      builder.return(2.llvm)
     end
   end
 
@@ -90,7 +90,7 @@ class BasicTests < Test::Unit::TestCase
       b = f.create_block.builder
       b.write do
         ret = add(2.llvm, 3.llvm) 
-        create_return(ret)
+        self.return(ret)
       end
     end
   end
@@ -106,13 +106,13 @@ class BasicTests < Test::Unit::TestCase
     
     b = entry_block.builder
     cmp = b.icmp_sgt(-1.llvm, 1.llvm)
-    b.create_cond_br(cmp, exit_block_true, exit_block_false)
+    b.cond_br(cmp, exit_block_true, exit_block_false)
 
     b = exit_block_true.builder
-    b.create_return(1.llvm)
+    b.return(1.llvm)
 
     b = exit_block_false.builder
-    b.create_return(0.llvm)
+    b.return(0.llvm)
  
     ExecutionEngine.get(m)
     result = ExecutionEngine.run_autoconvert(f)
@@ -129,11 +129,11 @@ class BasicTests < Test::Unit::TestCase
     b = f_callee.create_block.builder
     x, y = f_callee.arguments
     sum = b.add(x, y)
-    b.create_return(sum)
+    b.return(sum)
     
     b = f_caller.create_block.builder
-    ret = b.create_call(f_callee, 2.llvm, 3.llvm)
-    b.create_return(ret)
+    ret = b.call(f_callee, 2.llvm, 3.llvm)
+    b.return(ret)
 
     ExecutionEngine.get(m)
     result = ExecutionEngine.run_autoconvert(f_caller)
@@ -150,18 +150,18 @@ class BasicTests < Test::Unit::TestCase
     exit_block = f.create_block
 
     b = entry_block.builder
-    b.create_br(loop_block)
+    b.br(loop_block)
 
     b = loop_block.builder
-    phi = b.create_phi(Type::Int64Ty)
+    phi = b.phi(Type::Int64Ty)
     phi.add_incoming(0.llvm, entry_block)
     count = b.add(phi, 1.llvm)
     phi.add_incoming(count, loop_block)
     cmp = b.icmp_ult(count, 10.llvm)
-    b.create_cond_br(cmp, loop_block, exit_block)
+    b.cond_br(cmp, loop_block, exit_block)
 
     b = exit_block.builder
-    b.create_return(phi)
+    b.return(phi)
 
     ExecutionEngine.get(m)
     result = ExecutionEngine.run_autoconvert(f)
@@ -177,7 +177,7 @@ class BasicTests < Test::Unit::TestCase
     ])
     f = m.get_or_insert_function('main', type)
     b = f.create_block.builder
-    b.create_return(666.llvm(Type::Int32Ty))
+    b.return(666.llvm(Type::Int32Ty))
 
     m.write_bitcode("test/static.o")
   end

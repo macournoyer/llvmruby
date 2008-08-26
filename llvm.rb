@@ -32,7 +32,7 @@ module LLVM
 
     Instruction.constants.grep(/^ICMP_/) do |pred|
       define_method(pred.downcase) do |x, y|
-        create_icmp(Instruction.const_get(pred), x, y)
+        icmp(Instruction.const_get(pred), x, y)
       end
     end
 
@@ -76,31 +76,31 @@ module LLVM
     end
 
     def slen(str)
-      val_ptr = create_int_to_ptr(str, P_RSTRING)
-      len_ptr = create_struct_gep(val_ptr, 1)
-      create_load(len_ptr)
+      val_ptr = int_to_ptr(str, P_RSTRING)
+      len_ptr = struct_gep(val_ptr, 1)
+      load(len_ptr)
     end
 
     def alen(ary)
-      val_ptr = create_int_to_ptr(ary, P_RARRAY)
-      len_ptr = create_struct_gep(val_ptr, 1)
-      create_load(len_ptr)
+      val_ptr = int_to_ptr(ary, P_RARRAY)
+      len_ptr = struct_gep(val_ptr, 1)
+      load(len_ptr)
     end
 
     def aref(ary, idx)
-      val_ptr = create_int_to_ptr(ary, P_RARRAY)
-      data_ptr = create_struct_gep(val_ptr, 3)
-      data_ptr = create_load(data_ptr)
-      slot_n = create_gep(data_ptr, idx.llvm)
-      create_load(slot_n)
+      val_ptr = int_to_ptr(ary, P_RARRAY)
+      data_ptr = struct_gep(val_ptr, 3)
+      data_ptr = load(data_ptr)
+      slot_n = gep(data_ptr, idx.llvm)
+      load(slot_n)
     end
 
     def aset(ary, idx, set)
-      val_ptr = create_int_to_ptr(ary, P_RARRAY)
-      data_ptr = create_struct_gep(val_ptr, 3)
-      data_ptr = create_load(data_ptr)
-      slot_n = create_gep(data_ptr, idx.llvm)
-      create_store(set, slot_n)
+      val_ptr = int_to_ptr(ary, P_RARRAY)
+      data_ptr = struct_gep(val_ptr, 3)
+      data_ptr = load(data_ptr)
+      slot_n = gep(data_ptr, idx.llvm)
+      store(set, slot_n)
     end
   end
 end

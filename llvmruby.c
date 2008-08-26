@@ -41,20 +41,20 @@ VALUE llvm_basic_block_builder(VALUE);
 
 VALUE llvm_builder_set_insert_point(VALUE, VALUE);
 VALUE llvm_builder_bin_op(VALUE, VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_phi(VALUE, VALUE);
-VALUE llvm_builder_create_return(VALUE, VALUE);
-VALUE llvm_builder_create_br(VALUE, VALUE);
-VALUE llvm_builder_create_cond_br(VALUE, VALUE, VALUE, VALUE);
+VALUE llvm_builder_phi(VALUE, VALUE);
+VALUE llvm_builder_return(VALUE, VALUE);
+VALUE llvm_builder_br(VALUE, VALUE);
+VALUE llvm_builder_cond_br(VALUE, VALUE, VALUE, VALUE);
 
-VALUE llvm_builder_create_alloca(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_load(VALUE, VALUE);
-VALUE llvm_builder_create_store(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_icmp(VALUE, VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_gep(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_struct_gep(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_int_to_ptr(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_int_cast(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_call(int, VALUE*, VALUE);
+VALUE llvm_builder_alloca(VALUE, VALUE, VALUE);
+VALUE llvm_builder_load(VALUE, VALUE);
+VALUE llvm_builder_store(VALUE, VALUE, VALUE);
+VALUE llvm_builder_icmp(VALUE, VALUE, VALUE, VALUE);
+VALUE llvm_builder_gep(VALUE, VALUE, VALUE);
+VALUE llvm_builder_struct_gep(VALUE, VALUE, VALUE);
+VALUE llvm_builder_int_to_ptr(VALUE, VALUE, VALUE);
+VALUE llvm_builder_int_cast(VALUE, VALUE, VALUE);
+VALUE llvm_builder_call(int, VALUE*, VALUE);
 VALUE llvm_builder_get_global(VALUE);
 
 VALUE llvm_value_get_constant(VALUE);
@@ -117,20 +117,20 @@ void Init_llvmruby() {
 
   rb_define_method(cLLVMBuilder, "set_insert_point", llvm_builder_set_insert_point, 1);
   rb_define_method(cLLVMBuilder, "bin_op", llvm_builder_bin_op, 3);
-  rb_define_method(cLLVMBuilder, "create_phi", llvm_builder_create_phi, 1);
-  rb_define_method(cLLVMBuilder, "create_return", llvm_builder_create_return, 1);
-  rb_define_method(cLLVMBuilder, "create_br", llvm_builder_create_br, 1);
-  rb_define_method(cLLVMBuilder, "create_cond_br", llvm_builder_create_cond_br, 3);
-  rb_define_method(cLLVMBuilder, "create_alloca", llvm_builder_create_alloca, 2);
-  rb_define_method(cLLVMBuilder, "create_load", llvm_builder_create_load, 1);
-  rb_define_method(cLLVMBuilder, "create_store", llvm_builder_create_store, 2);
-  rb_define_method(cLLVMBuilder, "create_icmp", llvm_builder_create_icmp, 3);
+  rb_define_method(cLLVMBuilder, "phi", llvm_builder_phi, 1);
+  rb_define_method(cLLVMBuilder, "return", llvm_builder_return, 1);
+  rb_define_method(cLLVMBuilder, "br", llvm_builder_br, 1);
+  rb_define_method(cLLVMBuilder, "cond_br", llvm_builder_cond_br, 3);
+  rb_define_method(cLLVMBuilder, "alloca", llvm_builder_alloca, 2);
+  rb_define_method(cLLVMBuilder, "load", llvm_builder_load, 1);
+  rb_define_method(cLLVMBuilder, "store", llvm_builder_store, 2);
+  rb_define_method(cLLVMBuilder, "icmp", llvm_builder_icmp, 3);
 
-  rb_define_method(cLLVMBuilder, "create_gep", llvm_builder_create_gep, 2);
-  rb_define_method(cLLVMBuilder, "create_struct_gep", llvm_builder_create_struct_gep, 2);
-  rb_define_method(cLLVMBuilder, "create_int_to_ptr", llvm_builder_create_int_to_ptr, 2);
-  rb_define_method(cLLVMBuilder, "create_int_cast", llvm_builder_create_int_cast, 3);
-  rb_define_method(cLLVMBuilder, "create_call", llvm_builder_create_call, -1);
+  rb_define_method(cLLVMBuilder, "gep", llvm_builder_gep, 2);
+  rb_define_method(cLLVMBuilder, "struct_gep", llvm_builder_struct_gep, 2);
+  rb_define_method(cLLVMBuilder, "int_to_ptr", llvm_builder_int_to_ptr, 2);
+  rb_define_method(cLLVMBuilder, "int_cast", llvm_builder_int_cast, 3);
+  rb_define_method(cLLVMBuilder, "call", llvm_builder_call, -1);
   rb_define_method(cLLVMBuilder, "get_global", llvm_builder_get_global, 0);
 
   rb_define_method(cLLVMPhi, "add_incoming", llvm_phi_add_incoming, 2);

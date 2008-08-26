@@ -31,10 +31,10 @@ type = Type.function(VALUE, [VALUE, VALUE])
 f = m.get_or_insert_function('shakula', type)
 obj, ivar_sym = f.arguments
 b = f.create_block.builder
-new_ary = b.create_call(rb_ary_new)
-ivar_id = b.create_call(rb_to_id, ivar_sym)
-ret_val = b.create_call(rb_ivar_get, obj, ivar_id)
-b.create_return(ret_val)
+new_ary = b.call(rb_ary_new)
+ivar_id = b.call(rb_to_id, ivar_sym)
+ret_val = b.call(rb_ivar_get, obj, ivar_id)
+b.return(ret_val)
 ret = ExecutionEngine.run_function(f, test_instance, :@shaka)
 puts "get instance variable @shaka: #{ret.inspect}"
 
@@ -46,7 +46,7 @@ ary = f.arguments.first
 len = b.alen(ary)
 idx = b.sub(len, 1.llvm)
 ret = b.aref(ary, idx)
-b.create_return(ret)
+b.return(ret)
 last = f
 
 # Swap the first and last elements of an array (in place)
@@ -62,7 +62,7 @@ x = b.aref(ary, idx_x)
 y = b.aref(ary, idx_y)
 b.aset(ary, idx_x, y)
 b.aset(ary, idx_y, x)
-b.create_return(ary)
+b.return(ary)
 swap = f
 
 # Add 1 to every array element (in place)
@@ -77,10 +77,10 @@ exit_block = f.create_block
 b = entry_block.builder
 len = b.alen(ary)
 cmp = b.icmp_eq(0.llvm, len)
-b.create_cond_br(cmp, exit_block, loop_block)
+b.cond_br(cmp, exit_block, loop_block)
 
 b = loop_block.builder
-idx = b.create_phi(Type::Int64Ty)
+idx = b.phi(Type::Int64Ty)
 idx.add_incoming(0.llvm, entry_block)
 next_idx = b.add(1.llvm, idx)
 idx.add_incoming(next_idx, loop_block)
@@ -88,10 +88,10 @@ v = b.fix2int(b.aref(ary, idx))
 v1 = b.add(1.llvm, v)
 b.aset(ary, idx, b.num2fix(v1))
 cmp = b.icmp_ult(next_idx, len)
-b.create_cond_br(cmp, loop_block, exit_block)
+b.cond_br(cmp, loop_block, exit_block)
 
 b = exit_block.builder
-b.create_return(ary)
+b.return(ary)
 add1 = f
 
 ret = ExecutionEngine.run_function(add1, [1,2,3,4,5])
@@ -111,10 +111,10 @@ len = b.alen(ary)
 half_len = b.udiv(len, 2.llvm)
 last_idx = b.sub(len, 1.llvm)
 cmp = b.icmp_eq(0.llvm, len)
-b.create_cond_br(cmp, exit_block, loop_block)
+b.cond_br(cmp, exit_block, loop_block)
 
 b = loop_block.builder
-idx = b.create_phi(Type::Int64Ty)
+idx = b.phi(Type::Int64Ty)
 idx.add_incoming(0.llvm, entry_block)
 next_idx = b.add(1.llvm, idx)
 idx.add_incoming(next_idx, loop_block)
@@ -128,10 +128,10 @@ b.aset(ary, idx_x, y)
 b.aset(ary, idx_y, x)
 
 cmp = b.icmp_ult(next_idx, half_len)
-b.create_cond_br(cmp, loop_block, exit_block)
+b.cond_br(cmp, loop_block, exit_block)
 
 b = exit_block.builder
-b.create_return(ary)
+b.return(ary)
 reverse = f
 
 ret = ExecutionEngine.run_function(reverse, [1,2,3,4,5])

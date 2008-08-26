@@ -9,10 +9,10 @@ class Builder
   include RubyHelpers
 
   def self.set_globals(b)
-    @@stack = b.create_alloca(VALUE, 100)
-    @@stack_ptr = b.create_alloca(P_VALUE, 0)
-    b.create_store(@@stack, @@stack_ptr)
-    @@locals = b.create_alloca(VALUE, 100)
+    @@stack = b.alloca(VALUE, 100)
+    @@stack_ptr = b.alloca(P_VALUE, 0)
+    b.store(@@stack, @@stack_ptr)
+    @@locals = b.alloca(VALUE, 100)
   end
 
   def stack 
@@ -24,23 +24,23 @@ class Builder
   end
 
   def push(val)
-    sp = create_load(stack_ptr)
-    create_store(val, sp)
-    new_sp = create_gep(sp, 1.llvm)
-    create_store(new_sp, stack_ptr)
+    sp = load(stack_ptr)
+    store(val, sp)
+    new_sp = gep(sp, 1.llvm)
+    store(new_sp, stack_ptr)
   end 
 
   def pop
-    sp = create_load(stack_ptr)
-    new_sp = create_gep(sp, -1.llvm)
-    create_store(new_sp, stack_ptr)
-    create_load(new_sp)
+    sp = load(stack_ptr)
+    new_sp = gep(sp, -1.llvm)
+    store(new_sp, stack_ptr)
+    load(new_sp)
   end
 
   def peek(n = 1)
-    sp = create_load(stack_ptr)
-    peek_sp = create_gep(sp, (-n).llvm)
-    create_load(peek_sp)
+    sp = load(stack_ptr)
+    peek_sp = gep(sp, (-n).llvm)
+    load(peek_sp)
   end
 
   def locals
@@ -93,7 +93,7 @@ def bytecode_test
   blocks = bytecode.map { f.create_block } 
   exit_block = f.create_block
   blocks << exit_block
-  b.create_br(blocks.first)
+  b.br(blocks.first)
 
   bytecode.each_with_index do |opcode, i|
     op, arg = opcode
@@ -116,11 +116,11 @@ def bytecode_test
       b.push(v2)
     when :setlocal
       v = b.pop
-      local_slot = b.create_gep(b.locals, arg.llvm)
-      b.create_store(v, local_slot)
+      local_slot = b.gep(b.locals, arg.llvm)
+      b.store(v, local_slot)
     when :getlocal
-      local_slot = b.create_gep(b.locals, arg.llvm)
-      val = b.create_load(local_slot)
+      local_slot = b.gep(b.locals, arg.llvm)
+      val = b.load(local_slot)
       b.push(val)
     when :opt_plus
       v1 = b.fix2int(b.pop)
@@ -143,27 +143,27 @@ def bytecode_test
       out = b.aref(ary, idx)
       b.push(out)
     when :jump
-      b.create_br(blocks[arg])
+      b.br(blocks[arg])
     when :branchif
       v = b.pop
-      cmp = b.create_icmpeq(v, 1.llvm)
-      b.create_cond_br(cmp, blocks[i+1], blocks[arg])
+      cmp = b.icmp_eq(v, 1.llvm)
+      b.cond_br(cmp, blocks[i+1], blocks[arg])
     when :branchunless
       v = b.pop
-      cmp = b.create_icmpeq(v, 1.llvm)
-      b.create_cond_br(cmp, blocks[arg], blocks[i+1])
+      cmp = b.icmp_eq(v, 1.llvm)
+      b.cond_br(cmp, blocks[arg], blocks[i+1])
     else
       raise("Unrecognized op code")
     end
 
     if op != :jump && op != :branchif && op != :branchunless
-      b.create_br(blocks[i+1])
+      b.br(blocks[i+1])
     end
   end
 
   b = exit_block.builder
   ret_val = b.pop
-  b.create_return(ret_val)
+  b.return(ret_val)
 
   ret = ExecutionEngine.run_function(f, [1,2,3,4,5,6,7,8,9,10])
   puts "returned: #{ret}"
