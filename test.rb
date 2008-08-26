@@ -15,65 +15,6 @@ def call(f, arg)
   ExecutionEngine.run_function(f, arg)
 end
 
-def simple_test
-  f = testf
-  bb = f.create_block
-  builder = bb.builder
-  x = LLVM::Value.get_constant(23)
-  y = LLVM::Value.get_constant(42)
-  tmp = builder.add(x, y)
-  builder.create_return(tmp)
-  f.compile
-  puts "simple_test: #{f.call(0)}"
-end
-
-def call_test
-  f = LLVM::testf
-  entry_block = f.create_block
-  subroutine_block = f.create_block
-
-  builder = entry_block.builder
-  space = builder.create_alloca(10)
-  val = LLVM::Value.get_constant(23)
-  builder.create_store(val, space)
-
-  start_val = LLVM::Value.get_constant(0)
-  stop_val = LLVM::Value.get_constant(10)
-  cmp = builder.create_icmpeq(start_val, stop_val)
-
-  builder.create_br(subroutine_block)
-
-  builder = subroutine_block.builder
-  loaded_val = builder.create_load(space)
-  builder.create_return(loaded_val)
-
-  f.compile
-  puts "call_test: #{f.call(0)}"
-end
-
-def cond_br_test
-  f = testf
-  entry_block = f.create_block
-  true_block = f.create_block
-  false_block = f.create_block
-
-  builder = entry_block.builder
-  arg = f.argument
-  v1 = Value.get_constant(1)
-  cmp = builder.create_icmpeq(arg, v1)
-  builder.create_cond_br(cmp, true_block, false_block)
-
-  builder = true_block.builder
-  builder.create_return(Value.get_constant(23))
-
-  builder = false_block.builder
-  builder.create_return(Value.get_constant(666))
-
-  f.compile
-  puts "cond_br_test(0): #{f.call(0)}"
-  puts "cond_br_test(1): #{f.call(1)}"
-end
-
 def fib_test
   f = testf
   n = f.argument
@@ -127,28 +68,8 @@ def fib_test
   puts "outputs: #{outputs.inspect}"
 end
 
-def add_up
-  x = 0
-  y = 100
-  until y == 0 
-    y -= 1
-    x += y
-  end
-  x
-end
-
 class Builder
-  FIXNUM_FLAG = 0x1.llvm
-  CHAR = Type::Int8Ty
-  P_CHAR = Type::pointer(CHAR)
-  LONG = Type::Int64Ty
-  VALUE = Type::Int64Ty
-  P_VALUE = Type::pointer(VALUE)
-  RBASIC = Type::struct([VALUE, VALUE])
-  RARRAY = Type::struct([RBASIC, LONG, LONG, P_VALUE])
-  P_RARRAY = Type::pointer(RARRAY)
-  RSTRING = Type::struct([RBASIC, LONG, P_CHAR, VALUE])
-  P_RSTRING = Type::pointer(RSTRING)
+  include RubyInternals
 
   def self.set_globals(b)
     @@stack = b.create_alloca(VALUE, 100)
@@ -364,93 +285,3 @@ def bytecode_test
 end
 
 bytecode_test
-
-def test_types
-  type = Type::Int32Ty
-  struct = Type::struct([Type::Int32Ty, Type::Int32Ty, Type::Int32Ty])
-  array = Type::array(struct, 10)
-  vector = Type::vector(struct, 5)
-  puts struct.inspect
-  puts array.inspect
-  puts vector.inspect
-  puts "tested types"
-end
-
-def test_builder
-  f = testf
-  block = f.create_block
-  b = block.builder
-
-  arg = f.argument
-  out = b.slen(arg)
-  out = b.num2fix(out)
-  b.create_return(out)
-  #x = b.aref(arg, 3)
-  #x = b.fix2int(x)
-  #y = 10.llvm
-  #sum = b.add(x, y)
-  #b.aset(arg, 3, b.num2fix(sum))
-  #b.create_return(arg) 
-
-  f.compile
-  puts "out: #{f.call2("shaka")}"
-  #puts "meh: #{f.call2([1,2,3,4,5,6,7])}"
-end
-
-def test_fixnums
-  f = testf
-  block = f.create_block
-  b = block.builder
-  arg = f.argument
-  int = b.fix2int(arg)
-  sum = b.add(int, 23.llvm)
-  out = b.num2fix(sum)
-  b.create_return(out)
-  f.compile
-  puts "out: #{f.call2(5)}"
-end
-
-def test_array
-  f = testf
-  block = f.create_block
-  b = block.builder
-
-  rVALUE = Type::Int64Ty
-  cLONG  = Type::Int64Ty
-  rBasic = Type::struct([rVALUE, rVALUE])
-  rArray = Type::struct([rBasic, cLONG, cLONG, Type::pointer(rVALUE)])
-  rArrayPtr = Type::pointer(rArray)
-
-  arg = f.argument
-  val_ptr = b.create_int_to_ptr(arg, rArrayPtr) 
-  len_ptr = b.create_struct_gep(val_ptr, 2)
-  out = b.create_load(len_ptr)
-  data_ptr = b.create_struct_gep(val_ptr, 3)
-  data_ptr = b.create_load(data_ptr)
-  slot_n = b.create_gep(data_ptr, 0.llvm)
-  out = b.create_load(slot_n)
-  b.create_return(out)
-
-  #b.create_return(b.num2fix(out))
-
-  f.compile
-  puts "length [1,2]: #{f.call2([1,2])}"
-  puts "length [1,2,3,4]: #{f.call2([1,2,3,4])}"
-  puts "length [1,2,3,4,5,6]: #{f.call2([1,2,3,4,5,6])}"
-end
-
-def test_bitwise_ops
-  f = testf
-  bb = f.create_block
-  builder = bb.builder
-  arg = f.argument 
-  out = builder.fixnum?(arg) 
-  out = builder.shl(1.llvm, 2.llvm)
-  out = builder.lshr(out, 1.llvm)
-  builder.create_return(out) 
-  f.compile
-  puts "out: #{f.call2(0)}"
-  puts "out: #{f.call2(666)}"
-  puts "out: #{f.call2("shaka")}"
-  puts "out: #{f.call2([])}"
-end
