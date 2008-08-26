@@ -31,6 +31,7 @@ VALUE llvm_module_allocate(VALUE);
 VALUE llvm_module_initialize(VALUE); 
 VALUE llvm_module_get_or_insert_function(VALUE, VALUE);
 VALUE llvm_module_external_function(VALUE, VALUE, VALUE);
+VALUE llvm_module_write_bitcode(VALUE, VALUE);
 
 VALUE llvm_function_allocate(VALUE);
 VALUE llvm_function_create_block(VALUE);
@@ -98,7 +99,7 @@ void Init_llvmruby() {
   rb_define_module_function(cLLVMType, "vector", llvm_type_vector, 2);
   rb_define_module_function(cLLVMType, "function", llvm_type_function, 2);
 
-  rb_define_module_function(cLLVMValue, "get_constant", llvm_value_get_constant, 1);
+  rb_define_module_function(cLLVMValue, "get_constant", llvm_value_get_constant, 2);
   rb_define_module_function(cLLVMValue, "get_float_constant", llvm_value_get_float_constant, 1);
 
   init_instructions();
@@ -107,6 +108,7 @@ void Init_llvmruby() {
   rb_define_method(cLLVMModule, "initialize", llvm_module_initialize, 1);
   rb_define_method(cLLVMModule, "get_or_insert_function", llvm_module_get_or_insert_function, 2);
   rb_define_method(cLLVMModule, "external_function", llvm_module_external_function, 2);
+  rb_define_method(cLLVMModule, "write_bitcode", llvm_module_write_bitcode, 1);
 
   rb_define_method(cLLVMFunction, "create_block", llvm_function_create_block, 0);
   rb_define_method(cLLVMFunction, "arguments", llvm_function_arguments, 0);

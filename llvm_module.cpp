@@ -1,4 +1,6 @@
 #include "llvmruby.h"
+#include "llvm/Bitcode/ReaderWriter.h"
+#include <fstream>
 
 extern "C" {
 
@@ -81,6 +83,16 @@ llvm_module_external_function(VALUE self, VALUE name, VALUE type) {
 }
 
 VALUE
+llvm_module_write_bitcode(VALUE self, VALUE file_name) {
+  // Don't really know how to handle c++ streams well, 
+  // dumping all into string buffer and then saving
+  std::ofstream file;
+  file.open(StringValuePtr(file_name)); 
+  WriteBitcodeToFile(LLVM_MODULE(self), file);   // Convert value into a string.
+  return Qtrue;
+}
+
+VALUE
 llvm_execution_engine_run_function(int argc, VALUE *argv, VALUE klass) {
   // Using run function is much slower than getting C function pointer
   // and calling that, but it lets us pass in arbitrary numbers of
@@ -94,12 +106,6 @@ llvm_execution_engine_run_function(int argc, VALUE *argv, VALUE klass) {
 
   GenericValue v = EE->runFunction(LLVM_FUNCTION(argv[0]), arg_values);
   VALUE val = v.IntVal.getZExtValue();
-
-  /*
-  if(arg == Qnil) {  
-    val = INT2NUM(val);
-  }
-  */
 
   return val;
 }

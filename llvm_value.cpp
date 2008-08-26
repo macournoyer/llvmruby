@@ -5,8 +5,8 @@ VALUE llvm_value_wrap(Value* v) {
   return Data_Wrap_Struct(cLLVMValue, NULL, NULL, v); 
 }
 
-VALUE llvm_value_get_constant(VALUE self, VALUE v) {
-  return llvm_value_wrap(ConstantInt::get(Type::Int64Ty, FIX2INT(v)));
+VALUE llvm_value_get_constant(VALUE self, VALUE type, VALUE v) {
+  return llvm_value_wrap(ConstantInt::get(LLVM_TYPE(type), FIX2INT(v)));
 }
 
 VALUE llvm_value_get_float_constant(VALUE self, VALUE v) {

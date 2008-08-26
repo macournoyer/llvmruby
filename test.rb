@@ -137,20 +137,6 @@ def add_up
   x
 end
 
-GC.disable
-
-class Fixnum
-  def llvm
-    Value::get_constant(self)
-  end
-end
-
-class LLVM::Value
-  def llvm
-    self
-  end
-end
-
 class Builder
   FIXNUM_FLAG = 0x1.llvm
   CHAR = Type::Int8Ty

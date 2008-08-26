@@ -120,7 +120,7 @@ class BasicTests < Test::Unit::TestCase
   end
 
   def test_function_calls
-    m = LLVM::Module.new("test_module")
+    m = LLVM::Module.new('test_module')
     type = Type::function(Type::Int64Ty, [])
     f_caller = m.get_or_insert_function("caller", type)
     type = Type::function(Type::Int64Ty, [Type::Int64Ty, Type::Int64Ty])
@@ -141,9 +141,9 @@ class BasicTests < Test::Unit::TestCase
   end
 
   def test_phi_node
-    m = LLVM::Module.new("test_module")
+    m = LLVM::Module.new('test_module')
     type = Type::function(Type::Int64Ty, [])
-    f = m.get_or_insert_function("phi_node", type)
+    f = m.get_or_insert_function('phi_node', type)
 
     entry_block = f.create_block
     loop_block = f.create_block
@@ -168,13 +168,17 @@ class BasicTests < Test::Unit::TestCase
     assert_equal(9, result)
   end
 
-  #def test_get_global
-  #  f = Function.new("test_get_global", Type::Int64Ty, [Type::Int64Ty])
-  #  b = f.create_block.builder
-  #  vp = b.get_global
-  #  v = b.create_load(vp)
-  #  b.create_return(v)
-  #  f.compile
-  #  assert_equal(23, f.call2(0))
-  #end
+  def test_bitcode_writer
+    m = LLVM::Module.new('static_module')
+    # create main function
+    type = Type.function(Type::Int32Ty, [
+      Type::Int32Ty,
+      Type.pointer(Type.pointer(Type::Int8Ty))
+    ])
+    f = m.get_or_insert_function('main', type)
+    b = f.create_block.builder
+    b.create_return(666.llvm(Type::Int32Ty))
+
+    m.write_bitcode("test/static.o")
+  end
 end

@@ -1,8 +1,8 @@
 require 'llvmruby'
 
 class Fixnum
-  def llvm
-    LLVM::Value.get_constant(self)
+  def llvm(type = LLVM::Type::Int64Ty)
+    LLVM::Value.get_constant(type, self)
   end
 end
 
