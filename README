@@ -37,7 +37,11 @@ Look in test.rb to see examples of use and start messing around.
 
 * Caveats
 
-I created this for version 2.3 of LLVM.  Other versions may not work.
+I created this using very latest LLVM (from svn, soon to be 2.4).  Other 
+versions may not work.  I have been trying to get the 2.3 released package 
+to work, only one conditional typedef is required, but it complaining about 
+fPIC stuff :(
+
 I have only been using this on 64bit machines.  I know for a fact that
 the example JIT assumes that you are using 64bit Ruby.  These should
 be quite easy to change in the Ruby code, but I have no machine to 
@@ -46,7 +50,13 @@ test that on.
 * Things that definitely do not work right now
 
 No attempt has been made to properly free LLVM objects.  This probably
-isn't hard, LLVM api has easy to deal with memory management.
+isn't hard, LLVM api has easy to deal with memory management.  Many LLVM
+objects end up owned by modules/execution engine and shouldn't be freed
+normally anyway.
+
+There needs to be a lot more exception raising when arguments are of wrong
+number/type and need to try/catch around c++ calls and turn exception into
+Ruby exceptions.
 
 * Copying
 
