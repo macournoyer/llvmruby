@@ -119,31 +119,11 @@ llvm_builder_create_store(VALUE self, VALUE rv, VALUE rptr) {
 }
 
 VALUE
-llvm_builder_create_icmpeq(VALUE self, VALUE rlhs, VALUE rrhs) {
-  DATA_GET_BUILDER
-
-  Value *lhs, *rhs;
-  Data_Get_Struct(rlhs, Value, lhs);
-  Data_Get_Struct(rrhs, Value, rhs);
-  return llvm_value_wrap(builder->CreateICmpEQ(lhs, rhs));
-}
-
-VALUE
-llvm_builder_create_icmpult(VALUE self, VALUE rlhs, VALUE rrhs) {
-  DATA_GET_BUILDER
-
-  Value *lhs, *rhs;
-  Data_Get_Struct(rlhs, Value, lhs);
-  Data_Get_Struct(rrhs, Value, rhs);
-  return llvm_value_wrap(builder->CreateICmpULT(lhs, rhs));
-}
-
-VALUE
 llvm_builder_create_icmp(VALUE self, VALUE pred, VALUE lhs, VALUE rhs) {
   DATA_GET_BUILDER
 
   CmpInst::Predicate p = (CmpInst::Predicate)FIX2INT(pred);
-  Value *v = builder->CreateICmp(p, LLVM_VAL(rhs), LLVM_VAL(lhs));
+  Value *v = builder->CreateICmp(p, LLVM_VAL(lhs), LLVM_VAL(rhs));
   return llvm_value_wrap(v);
 }
 

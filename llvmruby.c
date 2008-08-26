@@ -48,8 +48,6 @@ VALUE llvm_builder_create_cond_br(VALUE, VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_alloca(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_load(VALUE, VALUE);
 VALUE llvm_builder_create_store(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_icmpeq(VALUE, VALUE, VALUE);
-VALUE llvm_builder_create_icmpult(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_icmp(VALUE, VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_create_struct_gep(VALUE, VALUE, VALUE);
@@ -124,8 +122,6 @@ void Init_llvmruby() {
   rb_define_method(cLLVMBuilder, "create_alloca", llvm_builder_create_alloca, 2);
   rb_define_method(cLLVMBuilder, "create_load", llvm_builder_create_load, 1);
   rb_define_method(cLLVMBuilder, "create_store", llvm_builder_create_store, 2);
-  rb_define_method(cLLVMBuilder, "create_icmpeq", llvm_builder_create_icmpeq, 2);
-  rb_define_method(cLLVMBuilder, "create_icmpult", llvm_builder_create_icmpult, 2);
   rb_define_method(cLLVMBuilder, "create_icmp", llvm_builder_create_icmp, 3);
 
   rb_define_method(cLLVMBuilder, "create_gep", llvm_builder_create_gep, 2);

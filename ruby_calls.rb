@@ -76,7 +76,7 @@ exit_block = f.create_block
 
 b = entry_block.builder
 len = b.alen(ary)
-cmp = b.create_icmpeq(0.llvm, len)
+cmp = b.icmp_eq(0.llvm, len)
 b.create_cond_br(cmp, exit_block, loop_block)
 
 b = loop_block.builder
@@ -87,7 +87,7 @@ idx.add_incoming(next_idx, loop_block)
 v = b.fix2int(b.aref(ary, idx))
 v1 = b.add(1.llvm, v)
 b.aset(ary, idx, b.num2fix(v1))
-cmp = b.create_icmpult(next_idx, len)
+cmp = b.icmp_ult(next_idx, len)
 b.create_cond_br(cmp, loop_block, exit_block)
 
 b = exit_block.builder
@@ -110,7 +110,7 @@ b = entry_block.builder
 len = b.alen(ary)
 half_len = b.udiv(len, 2.llvm)
 last_idx = b.sub(len, 1.llvm)
-cmp = b.create_icmpeq(0.llvm, len)
+cmp = b.icmp_eq(0.llvm, len)
 b.create_cond_br(cmp, exit_block, loop_block)
 
 b = loop_block.builder
@@ -127,7 +127,7 @@ y = b.aref(ary, idx_y)
 b.aset(ary, idx_x, y)
 b.aset(ary, idx_y, x)
 
-cmp = b.create_icmpult(next_idx, half_len)
+cmp = b.icmp_ult(next_idx, half_len)
 b.create_cond_br(cmp, loop_block, exit_block)
 
 b = exit_block.builder

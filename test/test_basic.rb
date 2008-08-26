@@ -157,7 +157,7 @@ class BasicTests < Test::Unit::TestCase
     phi.add_incoming(0.llvm, entry_block)
     count = b.add(phi, 1.llvm)
     phi.add_incoming(count, loop_block)
-    cmp = b.create_icmpult(count, 10.llvm)
+    cmp = b.icmp_ult(count, 10.llvm)
     b.create_cond_br(cmp, loop_block, exit_block)
 
     b = exit_block.builder
