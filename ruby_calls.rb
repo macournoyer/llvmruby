@@ -27,7 +27,7 @@ end
 test_instance = TestClass.new
 
 # take an object and an instance variable symbol, return value of instance variable
-type = Type.function(VALUE, [VALUE, VALUE])
+type = ftype(VALUE, [VALUE, VALUE])
 f = m.get_or_insert_function('shakula', type)
 obj, ivar_sym = f.arguments
 b = f.create_block.builder
@@ -39,7 +39,7 @@ ret = ExecutionEngine.run_function(f, test_instance, :@shaka)
 puts "get instance variable @shaka: #{ret.inspect}"
 
 # Return the last element of an array
-type = Type.function(Type::Int64Ty, [Type::Int64Ty])
+type = ftype(VALUE, [VALUE])
 f = m.get_or_insert_function('last', type)
 b = f.create_block.builder
 ary = f.arguments.first
@@ -50,7 +50,7 @@ b.return(ret)
 last = f
 
 # Swap the first and last elements of an array (in place)
-type = Type.function(Type::Int64Ty, [Type::Int64Ty])
+type = ftype(VALUE, [VALUE])
 f = m.get_or_insert_function('swap', type)
 b = f.create_block.builder
 ary = f.arguments.first
@@ -66,7 +66,7 @@ b.return(ary)
 swap = f
 
 # Add 1 to every array element (in place)
-type = Type.function(Type::Int64Ty, [Type::Int64Ty])
+type = ftype(VALUE, [VALUE])
 f = m.get_or_insert_function('add1', type)
 ary = f.arguments.first
 
@@ -98,7 +98,7 @@ ret = ExecutionEngine.run_function(add1, [1,2,3,4,5])
 puts "add1: #{ret.inspect}"
 
 # Add 1 to every array element (in place)
-type = Type.function(Type::Int64Ty, [Type::Int64Ty])
+type = ftype(VALUE, [VALUE])
 f = m.get_or_insert_function('reverse', type)
 ary = f.arguments.first
 
@@ -136,27 +136,3 @@ reverse = f
 
 ret = ExecutionEngine.run_function(reverse, [1,2,3,4,5])
 puts "reverse: #{ret.inspect}"
-
-# Run some benchmarks
-if false
-def ruby_reverse(ary)
-  half_len = ary.length/2 
-  last_idx = ary.length-1
-  for x in 0...half_len
-    y = last_idx-x
-    ary[x], ary[y] = ary[y], ary[x]
-  end
-  ary
-end
-
-ret = ruby_reverse([1,2,3,4,5])
-puts "ruby_reverse: #{ret.inspect}"
-    
-require 'benchmark'
-n = 10
-ary = Array.new(100000) {|x| x}
-Benchmark.bm do |x|
-  x.report { n.times { ruby_reverse(ary) } }
-  x.report { n.times { ExecutionEngine.run_function(reverse, ary) } }
-end
-end
