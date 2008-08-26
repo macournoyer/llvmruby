@@ -34,6 +34,12 @@ module LLVM
     bin_ops += ['Shl', 'LShr', 'AShr', 'And', 'Or', 'Xor']
     bin_ops.each {|op| add_bin_op(op)}
 
+    Instruction.constants.grep(/^ICMP_/) do |pred|
+      define_method(pred.downcase) do |x, y|
+        create_icmp(Instruction.const_get(pred), x, y)
+      end
+    end
+
     def write(&b)
       instance_eval(&b)
     end

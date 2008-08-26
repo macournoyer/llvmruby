@@ -95,6 +95,30 @@ class BasicTests < Test::Unit::TestCase
     end
   end
 
+  def test_cmps
+    m = LLVM::Module.new("test_cmps")
+    type = Type.function(Type::Int64Ty, [])
+    f = m.get_or_insert_function("sgt", type)
+    
+    entry_block = f.create_block
+    exit_block_true = f.create_block
+    exit_block_false = f.create_block
+    
+    b = entry_block.builder
+    cmp = b.icmp_sgt(-1.llvm, 1.llvm)
+    b.create_cond_br(cmp, exit_block_true, exit_block_false)
+
+    b = exit_block_true.builder
+    b.create_return(1.llvm)
+
+    b = exit_block_false.builder
+    b.create_return(0.llvm)
+ 
+    ExecutionEngine.get(m)
+    result = ExecutionEngine.run_autoconvert(f)
+    assert_equal(0, result)
+  end
+
   def test_function_calls
     m = LLVM::Module.new("test_module")
     type = Type::function(Type::Int64Ty, [])

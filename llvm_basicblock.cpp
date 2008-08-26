@@ -139,7 +139,7 @@ llvm_builder_create_icmpult(VALUE self, VALUE rlhs, VALUE rrhs) {
 }
 
 VALUE
-llvm_builder_create_icmp(VALUE self, VALUE pred, VALUE rhs, VALUE lhs) {
+llvm_builder_create_icmp(VALUE self, VALUE pred, VALUE lhs, VALUE rhs) {
   DATA_GET_BUILDER
 
   CmpInst::Predicate p = (CmpInst::Predicate)FIX2INT(pred);
