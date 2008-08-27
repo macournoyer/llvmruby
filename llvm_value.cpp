@@ -72,5 +72,14 @@ void init_types() {
   rb_define_const(cLLVMType, "LabelTy",  Data_Wrap_Struct(cLLVMType, NULL, NULL, const_cast<Type*>(Type::LabelTy)));
   rb_define_const(cLLVMType, "FloatTy",  Data_Wrap_Struct(cLLVMType, NULL, NULL, const_cast<Type*>(Type::FloatTy)));
   rb_define_const(cLLVMType, "DoubleTy",  Data_Wrap_Struct(cLLVMType, NULL, NULL, const_cast<Type*>(Type::DoubleTy)));
+
+  // Figure out details of the target machine
+  const IntegerType *machine_word_type;
+  if(sizeof(void*) == 4) {
+    machine_word_type = Type::Int32Ty;
+  } else {
+    machine_word_type = Type::Int64Ty;
+  }
+  rb_define_const(cLLVMRuby, "MACHINE_WORD", Data_Wrap_Struct(cLLVMType, NULL, NULL, const_cast<IntegerType*>(machine_word_type)));
 }
 }

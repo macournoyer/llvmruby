@@ -6,7 +6,7 @@ include LLVM
 class BasicTests < Test::Unit::TestCase
   def function_tester(expected)
     m = LLVM::Module.new("test_module")
-    type = Type::function(Type::Int64Ty, [])
+    type = Type::function(MACHINE_WORD, [])
     f = m.get_or_insert_function("test", type)
     yield(f)
     ExecutionEngine.get(m);
@@ -97,7 +97,7 @@ class BasicTests < Test::Unit::TestCase
 
   def test_cmps
     m = LLVM::Module.new("test_cmps")
-    type = Type.function(Type::Int64Ty, [])
+    type = Type.function(MACHINE_WORD, [])
     f = m.get_or_insert_function("sgt", type)
     
     entry_block = f.create_block
@@ -121,9 +121,9 @@ class BasicTests < Test::Unit::TestCase
 
   def test_function_calls
     m = LLVM::Module.new('test_module')
-    type = Type::function(Type::Int64Ty, [])
+    type = Type::function(MACHINE_WORD, [])
     f_caller = m.get_or_insert_function("caller", type)
-    type = Type::function(Type::Int64Ty, [Type::Int64Ty, Type::Int64Ty])
+    type = Type::function(MACHINE_WORD, [MACHINE_WORD, MACHINE_WORD])
     f_callee = m.get_or_insert_function("callee", type)
 
     b = f_callee.create_block.builder
@@ -142,7 +142,7 @@ class BasicTests < Test::Unit::TestCase
 
   def test_phi_node
     m = LLVM::Module.new('test_module')
-    type = Type::function(Type::Int64Ty, [])
+    type = Type::function(MACHINE_WORD, [])
     f = m.get_or_insert_function('phi_node', type)
 
     entry_block = f.create_block
@@ -153,7 +153,7 @@ class BasicTests < Test::Unit::TestCase
     b.br(loop_block)
 
     b = loop_block.builder
-    phi = b.phi(Type::Int64Ty)
+    phi = b.phi(MACHINE_WORD)
     phi.add_incoming(0.llvm, entry_block)
     count = b.add(phi, 1.llvm)
     phi.add_incoming(count, loop_block)

@@ -80,7 +80,7 @@ cmp = b.icmp_eq(0.llvm, len)
 b.cond_br(cmp, exit_block, loop_block)
 
 b = loop_block.builder
-idx = b.phi(Type::Int64Ty)
+idx = b.phi(MACHINE_WORD)
 idx.add_incoming(0.llvm, entry_block)
 next_idx = b.add(1.llvm, idx)
 idx.add_incoming(next_idx, loop_block)
@@ -114,7 +114,7 @@ cmp = b.icmp_eq(0.llvm, len)
 b.cond_br(cmp, exit_block, loop_block)
 
 b = loop_block.builder
-idx = b.phi(Type::Int64Ty)
+idx = b.phi(MACHINE_WORD)
 idx.add_incoming(0.llvm, entry_block)
 next_idx = b.add(1.llvm, idx)
 idx.add_incoming(next_idx, loop_block)

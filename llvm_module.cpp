@@ -100,7 +100,7 @@ llvm_execution_engine_run_function(int argc, VALUE *argv, VALUE klass) {
   std::vector<GenericValue> arg_values;
   for(int i = 1; i < argc; ++i) {
     GenericValue arg_val;
-    arg_val.IntVal = APInt(64, argv[i]);
+    arg_val.IntVal = APInt(sizeof(long)*8, argv[i]);
     arg_values.push_back(arg_val);
   }
 

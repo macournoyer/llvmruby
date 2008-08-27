@@ -1,7 +1,7 @@
 require 'llvmruby'
 
 class Fixnum
-  def llvm(type = LLVM::Type::Int64Ty)
+  def llvm(type = LLVM::MACHINE_WORD)
     LLVM::Value.get_constant(type, self)
   end
 end
@@ -17,6 +17,7 @@ class LLVM::Value
     self
   end
 end
+
 
 module LLVM
   class Builder
@@ -46,10 +47,10 @@ module LLVM
     FIXNUM_FLAG = 0x1.llvm
     CHAR = Type::Int8Ty
     P_CHAR = Type::pointer(CHAR)
-    LONG = Type::Int64Ty
-    VALUE = Type::Int64Ty
+    LONG = MACHINE_WORD 
+    VALUE = MACHINE_WORD
     P_VALUE = Type::pointer(VALUE)
-    ID = Type::Int64Ty
+    ID = MACHINE_WORD
     RBASIC = Type::struct([VALUE, VALUE])
     RARRAY = Type::struct([RBASIC, LONG, LONG, P_VALUE])
     P_RARRAY = Type::pointer(RARRAY)
