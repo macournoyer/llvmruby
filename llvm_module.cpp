@@ -1,5 +1,6 @@
 #include "llvmruby.h"
 #include "llvm/Bitcode/ReaderWriter.h"
+#include "llvm/Analysis/Verifier.h"
 #include <fstream>
 
 extern "C" {
@@ -107,6 +108,7 @@ VALUE
 llvm_execution_engine_run_function(int argc, VALUE *argv, VALUE klass) {
   if(argc < 1) { rb_raise(rb_eArgError, "Expected at least one argument"); }
   CHECK_TYPE(argv[0], cLLVMFunction);
+  Function *func = LLVM_FUNCTION(argv[0]);
 
   // Using run function is much slower than getting C function pointer
   // and calling that, but it lets us pass in arbitrary numbers of
@@ -118,9 +120,8 @@ llvm_execution_engine_run_function(int argc, VALUE *argv, VALUE klass) {
     arg_values.push_back(arg_val);
   }
 
-  GenericValue v = EE->runFunction(LLVM_FUNCTION(argv[0]), arg_values);
+  GenericValue v = EE->runFunction(func, arg_values);
   VALUE val = v.IntVal.getZExtValue();
-
   return val;
 }
 

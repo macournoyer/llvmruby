@@ -30,6 +30,8 @@ llvm_builder_set_insert_point(VALUE self, VALUE rbb) {
 
 VALUE 
 llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
+  //CHECK_TYPE(rv1, cLLVMValue);
+  //CHECK_TYPE(rv2, cLLVMValue);
   DATA_GET_BUILDER
 
   Instruction::BinaryOps bin_op = (Instruction::BinaryOps)FIX2INT(rbin_op);
@@ -43,8 +45,8 @@ llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
 
 VALUE
 llvm_builder_phi(VALUE self, VALUE type) {
-  DATA_GET_BUILDER
   CHECK_TYPE(type, cLLVMType);
+  DATA_GET_BUILDER
   PHINode *v = builder->CreatePHI(LLVM_TYPE(type)); 
   return Data_Wrap_Struct(cLLVMPhi, NULL, NULL, v);
 }
@@ -60,11 +62,9 @@ llvm_phi_add_incoming(VALUE self, VALUE val, VALUE rbb) {
 
 VALUE 
 llvm_builder_return(VALUE self, VALUE rv) {
+  //CHECK_TYPE(rv, cLLVMValue);
   DATA_GET_BUILDER
-
-  Value *v;
-  Data_Get_Struct(rv, Value, v);
-  return llvm_value_wrap(builder->CreateRet(v));
+  return llvm_value_wrap(builder->CreateRet(LLVM_VAL(rv)));
 }
 
 VALUE 
