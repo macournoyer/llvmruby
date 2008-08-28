@@ -191,5 +191,9 @@ class BasicTests < Test::Unit::TestCase
     assert_raise(TypeError) { ExecutionEngine.get(5) }
     assert_raise(TypeError) { m.external_function(5, ftype) }
     assert_raise(TypeError) { m.external_function('fname', 5) }
+    assert_raise(TypeError) { m.write_bitcode(5) }
+    assert_raise(ArgumentError) { ExecutionEngine.run_function }
+    assert_raise(TypeError) { ExecutionEngine.run_function(5) }
+    assert_raise(TypeError) { ExecutionEngine.run_function(5, 5) }
   end
 end

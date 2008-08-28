@@ -18,7 +18,7 @@ llvm_basic_block_builder(VALUE self) {
 }
 
 #define DATA_GET_BUILDER IRBuilder<> *builder; Data_Get_Struct(self, IRBuilder<>, builder);
-#define DATA_GET_BLOCK   BasicBlock *bb; Data_Get_Struct(rbb, BasicBlock, bb);
+#define DATA_GET_BLOCK   BasicBlock *bb; CHECK_TYPE(rbb, cLLVMBasicBlock); Data_Get_Struct(rbb, BasicBlock, bb);
 
 VALUE
 llvm_builder_set_insert_point(VALUE self, VALUE rbb) {

@@ -93,6 +93,8 @@ llvm_module_external_function(VALUE self, VALUE name, VALUE type) {
 
 VALUE
 llvm_module_write_bitcode(VALUE self, VALUE file_name) {
+  Check_Type(file_name, T_STRING);
+
   // Don't really know how to handle c++ streams well, 
   // dumping all into string buffer and then saving
   std::ofstream file;
@@ -103,6 +105,12 @@ llvm_module_write_bitcode(VALUE self, VALUE file_name) {
 
 VALUE
 llvm_execution_engine_run_function(int argc, VALUE *argv, VALUE klass) {
+  if(argc < 1) { rb_raise(rb_eArgError, "Expected at least one argument"); }
+  CHECK_TYPE(argv[0], cLLVMFunctionType);
+  for(int i = 1; i < argc; ++i) {
+    CHECK_TYPE(argv[i], cLLVMValue);
+  }
+
   // Using run function is much slower than getting C function pointer
   // and calling that, but it lets us pass in arbitrary numbers of
   // arguments easily for now, which is nice
