@@ -181,4 +181,15 @@ class BasicTests < Test::Unit::TestCase
 
     m.write_bitcode("test/static.o")
   end
+
+  def test_type_errors
+    m = LLVM::Module.new('type_errors')
+    ftype = Type.function(Type::VoidTy, [])
+    assert_raise(TypeError) { f = LLVM::Module.new(5) }
+    assert_raise(TypeError) { m.get_or_insert_function(5, ftype) }
+    assert_raise(TypeError) { m.get_or_insert_function('bad_arg', 5) }
+    assert_raise(TypeError) { ExecutionEngine.get(5) }
+    assert_raise(TypeError) { m.external_function(5, ftype) }
+    assert_raise(TypeError) { m.external_function('fname', 5) }
+  end
 end

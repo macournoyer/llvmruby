@@ -11,12 +11,16 @@ llvm_module_allocate(VALUE klass) {
 
 VALUE
 llvm_module_initialize(VALUE self, VALUE rname) {
+  Check_Type(rname, T_STRING);
   DATA_PTR(self) = new Module(StringValuePtr(rname));
   return self;
 }
 
 VALUE
 llvm_module_get_or_insert_function(VALUE self, VALUE name, VALUE rtype) {
+  Check_Type(name, T_STRING);
+  CHECK_TYPE(rtype, cLLVMFunctionType);
+
   Module *m = LLVM_MODULE(self);
   FunctionType *type = LLVM_FUNC_TYPE(rtype);
   Function *f = cast<Function>(m->getOrInsertFunction(StringValuePtr(name), type));
@@ -58,6 +62,8 @@ static ExecutionEngine *EE = NULL;
 
 VALUE
 llvm_execution_engine_get(VALUE klass, VALUE module) {
+  CHECK_TYPE(module, cLLVMModule);
+
   Module *m = LLVM_MODULE(module);
   ExistingModuleProvider *MP = new ExistingModuleProvider(m);
 
@@ -72,6 +78,9 @@ llvm_execution_engine_get(VALUE klass, VALUE module) {
 
 VALUE
 llvm_module_external_function(VALUE self, VALUE name, VALUE type) {
+  Check_Type(name, T_STRING);
+  CHECK_TYPE(type, cLLVMFunctionType);
+
   Module *module = LLVM_MODULE(self);
   Function *f = Function::Create(
     LLVM_FUNC_TYPE(type), 

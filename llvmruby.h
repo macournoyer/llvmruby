@@ -44,6 +44,11 @@ extern VALUE cLLVMPassManager;
 #define LLVM_BASIC_BLOCK(obj) ((BasicBlock*)DATA_PTR(obj))
 #define LLVM_PHI(obj) ((PHINode*)DATA_PTR(obj))
 
+#define CHECK_TYPE(val, klass)\
+  if(CLASS_OF(val) != klass) {\
+    rb_raise(rb_eTypeError, "wrong argument type: %s given, expected %s", rb_obj_classname(val), rb_class2name(klass));\
+  }
+
 extern "C" {
 VALUE llvm_value_wrap(Value*);
 VALUE llvm_function_wrap(Function*);
