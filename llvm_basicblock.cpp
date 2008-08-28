@@ -44,14 +44,17 @@ llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
 VALUE
 llvm_builder_phi(VALUE self, VALUE type) {
   DATA_GET_BUILDER
+  CHECK_TYPE(type, cLLVMType);
   PHINode *v = builder->CreatePHI(LLVM_TYPE(type)); 
   return Data_Wrap_Struct(cLLVMPhi, NULL, NULL, v);
 }
 
 VALUE
-llvm_phi_add_incoming(VALUE self, VALUE val, VALUE block) {
+llvm_phi_add_incoming(VALUE self, VALUE val, VALUE rbb) {
+  CHECK_TYPE(val, cLLVMValue);
+  DATA_GET_BLOCK
   PHINode *phi = LLVM_PHI(self);
-  phi->addIncoming(LLVM_VAL(val), LLVM_BASIC_BLOCK(block));
+  phi->addIncoming(LLVM_VAL(val), bb);
   return self;
 }
 

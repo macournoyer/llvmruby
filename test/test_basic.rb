@@ -184,7 +184,7 @@ class BasicTests < Test::Unit::TestCase
 
   def test_type_errors
     m = LLVM::Module.new('type_errors')
-    ftype = Type.function(Type::VoidTy, [])
+    ftype = Type.function(Type::Int32Ty, [])
     assert_raise(TypeError) { f = LLVM::Module.new(5) }
     assert_raise(TypeError) { m.get_or_insert_function(5, ftype) }
     assert_raise(TypeError) { m.get_or_insert_function('bad_arg', 5) }
@@ -195,5 +195,18 @@ class BasicTests < Test::Unit::TestCase
     assert_raise(ArgumentError) { ExecutionEngine.run_function }
     assert_raise(TypeError) { ExecutionEngine.run_function(5) }
     assert_raise(TypeError) { ExecutionEngine.run_function(5, 5) }
+   
+    f = m.get_or_insert_function('test', ftype) 
+    block1 = f.create_block
+    block2 = f.create_block
+    b = block1.builder
+    assert_raise(TypeError) { b.set_insert_point(5) }
+    assert_raise(TypeError) { b.phi(5) }
+    phi = b.phi(Type::Int32Ty)
+    assert_raise(TypeError) { phi.add_incoming(5, 5) }
+    assert_raise(TypeError) { phi.add_incoming(5.llvm(Type::Int32Ty), 5) }
+    assert_raise(TypeError) { b.bin_op([], 2.llvm, 3.llvm) }
+    assert_raise(TypeError) { b.bin_op(Instruction::Add, 5, 3.llvm) }
+    assert_raise(TypeError) { b.bin_op(Instruction::Add, 3.llvm, 5) }
   end
 end

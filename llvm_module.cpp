@@ -106,10 +106,7 @@ llvm_module_write_bitcode(VALUE self, VALUE file_name) {
 VALUE
 llvm_execution_engine_run_function(int argc, VALUE *argv, VALUE klass) {
   if(argc < 1) { rb_raise(rb_eArgError, "Expected at least one argument"); }
-  CHECK_TYPE(argv[0], cLLVMFunctionType);
-  for(int i = 1; i < argc; ++i) {
-    CHECK_TYPE(argv[i], cLLVMValue);
-  }
+  CHECK_TYPE(argv[0], cLLVMFunction);
 
   // Using run function is much slower than getting C function pointer
   // and calling that, but it lets us pass in arbitrary numbers of
