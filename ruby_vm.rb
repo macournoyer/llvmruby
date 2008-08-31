@@ -12,6 +12,12 @@ class Symbol
   end
 end
 
+class Object
+  def llvm
+    LLVM::Value.get_immediate_constant(self)
+  end
+end
+
 class Builder
   include RubyHelpers
 
@@ -95,7 +101,7 @@ class RubyVM
       case op
       when :nop
       when :putobject
-        b.push(arg.object_id.llvm)
+        b.push(arg.llvm)
       when :pop
         b.pop
       when :dup
@@ -148,6 +154,11 @@ class RubyVM
         id = b.call(@rb_to_id, arg.llvm)
         v = b.call(@rb_ivar_get, obj, id)
         b.push(v)
+      when :setinstancevariable
+        new_val = b.pop
+        obj = b.peek
+        id = b.call(@rb_to_id, arg.llvm)
+        b.call(@rb_ivar_set, obj, id, new_val)
       else
         raise("Unrecognized op code")
       end

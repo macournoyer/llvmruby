@@ -13,6 +13,16 @@ VALUE llvm_value_get_float_constant(VALUE self, VALUE v) {
   return llvm_value_wrap(ConstantFP::get(Type::FloatTy, RFLOAT(v)->value));
 }
 
+VALUE llvm_value_get_immediate_constant(VALUE self, VALUE v) {
+  const IntegerType* type; 
+  if(sizeof(VALUE) == 4) {
+    type = Type::Int32Ty;
+  } else {
+    type = Type::Int64Ty;
+  }
+  return llvm_value_wrap(ConstantInt::get(type, (long)v));
+}
+
 VALUE llvm_type_pointer(VALUE self, VALUE rtype) {
   Type *type;
   Data_Get_Struct(rtype, Type, type);
