@@ -9,9 +9,9 @@ interact with the native Ruby 1.8/1.9 data types.
 
 * How to build
 
-You must get and build LLVM separately, available for download at:
+You must get LLVM from svn and build it separately:
 
-  http://llvm.org/releases  
+  $ svn co http://llvm.org/svn/llvm-project/llvm/trunk llvm 
 
 Make sure that you configure LLVM with PIC enabled:
   
@@ -42,10 +42,13 @@ versions may not work.  I have been trying to get the 2.3 released package
 to work, only one conditional typedef is required, but it complaining about 
 fPIC stuff :(
 
-I have only been using this on 64bit machines.  I know for a fact that
-the example JIT assumes that you are using 64bit Ruby.  These should
-be quite easy to change in the Ruby code, but I have no machine to 
-test that on.
+I primarily develop this on my home machine which is 64bit Fedora.  I 
+occasionally test it on a 32bit CentOS machine, and recently tested it 
+on a 32bit MacBook.  It built and passed tests with no issues.  My
+knowledge of building either Ruby or LLVM on Windows is minimal.  It
+should be doable, but I don't believe LLVM currently is usable with
+VC++, which is the main compiler for Ruby on Windows, so you may run
+into fun times trying to figure out a good way to make that go.
 
 * Things that definitely do not work right now
 
@@ -55,8 +58,13 @@ objects end up owned by modules/execution engine and shouldn't be freed
 normally anyway.
 
 There needs to be a lot more exception raising when arguments are of wrong
-number/type and need to try/catch around c++ calls and turn exception into
-Ruby exceptions.
+number/type.
+
+Malformed LLVM functions will cause the program to abort, even just 
+from calling verify on a module.  This seems like a bug in LLVM.
+Verification in theory is slow and should be used only for debugging, but
+it would nice if tests did not abort and die because of missing block
+terminators or whatever. 
 
 * Copying
 
