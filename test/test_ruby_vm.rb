@@ -4,6 +4,12 @@ require 'ruby_vm'
 
 include LLVM
 
+class IVarTest
+  def initialize
+    @shaka = 'khan'
+  end
+end
+
 class RubyVMTests < Test::Unit::TestCase
   def test_bytecodes
     #bytecode = [
@@ -37,11 +43,12 @@ class RubyVMTests < Test::Unit::TestCase
     #] 
 
     bytecode = [
-      [:putobject, 2],
-      [:opt_aref]
+      [:getinstancevariable, :@shaka]
     ]
+
+    obj = IVarTest.new
    
     vm = RubyVM.new
-    assert_equal(3, vm.compile_bytecode(bytecode))
+    assert_equal('khan', vm.compile_bytecode(bytecode, obj))
   end
 end

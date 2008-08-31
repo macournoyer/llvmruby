@@ -2,6 +2,16 @@ require 'llvm'
 include LLVM
 include RubyInternals
 
+class Symbol
+  # turn a symbol object_id into a VALUE
+  # from gc.c, symbols object_id's are calculated like this:
+  # SYM2ID(x) = RSHIFT((unsigned long)x,8)
+  # object_id = (SYM2ID(obj) * sizeof(RVALUE) + (4 << 2)) | FIXNUM_FLAG;
+  def llvm
+    (((object_id/20) << 8) | 0xe).llvm(MACHINE_WORD)
+  end
+end
+
 class Builder
   include RubyHelpers
 
@@ -45,14 +55,26 @@ class Builder
   end
 end
 
-
 class RubyVM
   def initialize
     @module = LLVM::Module.new('ruby_vm')
     ExecutionEngine.get(@module)
+
+    @rb_ary_new = @module.external_function('rb_ary_new', ftype(VALUE, []))
+    @rb_to_id = @module.external_function('rb_to_id', ftype(VALUE, [VALUE]))
+    @rb_ivar_get = @module.external_function('rb_ivar_get', ftype(VALUE, [VALUE, ID]))
+    @rb_ivar_set = @module.external_function('rb_ivar_set', ftype(VALUE, [VALUE, ID, VALUE]))
   end
 
-  def compile_bytecode(bytecode) 
+  def sym2id(sym)
+    (sym.id).llvm(Type::Int64Ty)
+  end
+
+  def ftype(ret, args)
+    Type.function(ret, args)
+  end
+
+  def compile_bytecode(bytecode, farg) 
     f = @module.get_or_insert_function('vm_func', Type.function(VALUE, [VALUE]))
     entry_block = f.create_block
     b = entry_block.builder
@@ -121,6 +143,11 @@ class RubyVM
         v = b.pop
         cmp = b.icmp_eq(v, 1.llvm)
         b.cond_br(cmp, blocks[arg], blocks[i+1])
+      when :getinstancevariable
+        obj = b.pop
+        id = b.call(@rb_to_id, arg.llvm)
+        v = b.call(@rb_ivar_get, obj, id)
+        b.push(v)
       else
         raise("Unrecognized op code")
       end
@@ -134,6 +161,6 @@ class RubyVM
     ret_val = b.pop
     b.return(ret_val)
 
-    ExecutionEngine.run_function(f, [1,2,3,4,5,6,7,8,9,10])
+    ExecutionEngine.run_function(f, farg)
   end
 end

@@ -21,6 +21,7 @@ rb_ivar_set = m.external_function('rb_ivar_set', ftype(VALUE, [VALUE, ID, VALUE]
 class TestClass
   def initialize
     @shaka = 'khan'
+    @fem = 'puter'
   end
 end
 
@@ -30,6 +31,7 @@ test_instance = TestClass.new
 type = ftype(VALUE, [VALUE, VALUE])
 f = m.get_or_insert_function('shakula', type)
 obj, ivar_sym = f.arguments
+ivar_sym = (((:@fem.object_id/20) << 8) | 0xe).llvm
 b = f.create_block.builder
 new_ary = b.call(rb_ary_new)
 ivar_id = b.call(rb_to_id, ivar_sym)
