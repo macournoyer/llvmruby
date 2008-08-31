@@ -37,8 +37,8 @@ new_ary = b.call(rb_ary_new)
 ivar_id = b.call(rb_to_id, ivar_sym)
 ret_val = b.call(rb_ivar_get, obj, ivar_id)
 b.return(ret_val)
-ret = ExecutionEngine.run_function(f, test_instance, :@shaka)
-puts "get instance variable @shaka: #{ret.inspect}"
+ret = ExecutionEngine.run_function(f, test_instance, :@fem)
+puts "get instance variable @fem: #{ret.inspect}"
 
 # Return the last element of an array
 type = ftype(VALUE, [VALUE])

@@ -67,6 +67,7 @@ class RubyVM
     ExecutionEngine.get(@module)
 
     @rb_ary_new = @module.external_function('rb_ary_new', ftype(VALUE, []))
+    @rb_ary_store = @module.external_function('rb_ary_store', ftype(VALUE, [VALUE, LONG, VALUE]))
     @rb_to_id = @module.external_function('rb_to_id', ftype(VALUE, [VALUE]))
     @rb_ivar_get = @module.external_function('rb_ivar_get', ftype(VALUE, [VALUE, ID]))
     @rb_ivar_set = @module.external_function('rb_ivar_set', ftype(VALUE, [VALUE, ID, VALUE]))
@@ -139,6 +140,12 @@ class RubyVM
         ary = b.pop
         out = b.aref(ary, idx)
         b.push(out)
+      when :opt_aset
+        set = b.pop
+        idx = b.fix2int(b.pop)
+        ary = b.pop
+        b.call(@rb_ary_store, ary, idx, set)
+        b.push(set)
       when :jump
         b.br(blocks[arg])
       when :branchif
@@ -159,6 +166,9 @@ class RubyVM
         obj = b.peek
         id = b.call(@rb_to_id, arg.llvm)
         b.call(@rb_ivar_set, obj, id, new_val)
+      when :newarray
+        ary = b.call(@rb_ary_new)
+        b.push(ary)
       else
         raise("Unrecognized op code")
       end

@@ -5,21 +5,6 @@ require 'ruby_vm'
 include LLVM
 
 class RubyVMTests < Test::Unit::TestCase
-  #bytecode = [
-  #  [:dup],
-  #  [:setlocal, 0],
-  #  [:putobject, 1],
-  #  [:opt_minus],
-  #  [:dup],
-  #  [:branchunless, 11],
-  #  [:dup],
-  #  [:getlocal, 0],
-  #  [:opt_mult],
-  #  [:setlocal, 0],
-  #  [:jump, 2],
-  #  [:getlocal, 0]
-  #]
-    
   def test_getinstancevariable
     bytecode = [
       [:getinstancevariable, :@shaka]
@@ -42,5 +27,20 @@ class RubyVMTests < Test::Unit::TestCase
     vm = RubyVM.new
     vm.compile_bytecode(bytecode, obj)
     assert_equal('puter', obj.instance_variable_get(:@fem))
+  end
+
+  def test_opt_aset
+    bytecode = [
+      [:newarray],
+      [:dup],
+      [:putobject, LLVM::Value.get_immediate_constant(0)],
+      [:putobject, LLVM::Value.get_immediate_constant('shaka')],
+      [:opt_aset],
+      [:pop]
+    ]
+  
+    vm = RubyVM.new
+    ret = vm.compile_bytecode(bytecode, nil)
+    assert_equal(ret, ['shaka'])
   end
 end
