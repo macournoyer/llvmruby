@@ -30,6 +30,7 @@ llvm_builder_set_insert_point(VALUE self, VALUE rbb) {
 
 VALUE 
 llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
+  Check_Type(rbin_op, T_FIXNUM);
   //CHECK_TYPE(rv1, cLLVMValue);
   //CHECK_TYPE(rv2, cLLVMValue);
   DATA_GET_BUILDER
