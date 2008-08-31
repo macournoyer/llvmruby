@@ -71,6 +71,8 @@ class RubyVM
     @rb_to_id = @module.external_function('rb_to_id', ftype(VALUE, [VALUE]))
     @rb_ivar_get = @module.external_function('rb_ivar_get', ftype(VALUE, [VALUE, ID]))
     @rb_ivar_set = @module.external_function('rb_ivar_set', ftype(VALUE, [VALUE, ID, VALUE]))
+
+    @func_n = 0
   end
 
   def sym2id(sym)
@@ -82,7 +84,9 @@ class RubyVM
   end
 
   def compile_bytecode(bytecode, farg) 
-    f = @module.get_or_insert_function('vm_func', Type.function(VALUE, [VALUE]))
+    f = @module.get_or_insert_function("vm_func#{@func_n}", Type.function(VALUE, [VALUE]))
+    @func_n += 1
+
     entry_block = f.create_block
     b = entry_block.builder
     Builder.set_globals(b)
@@ -146,6 +150,15 @@ class RubyVM
         ary = b.pop
         b.call(@rb_ary_store, ary, idx, set)
         b.push(set)
+      when :opt_lt
+        obj = b.pop
+        recv = b.pop
+        x = b.fix2int(recv)
+        y = b.fix2int(obj)
+        val = b.icmp_sle(x, y)
+        val = b.int_cast(val, LONG, false)
+        val = b.mul(val, 2.llvm)
+        b.push(val)
       when :jump
         b.br(blocks[arg])
       when :branchif
