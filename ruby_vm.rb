@@ -85,14 +85,25 @@ class RubyVM
     Type.function(ret, args)
   end
 
-  def self.compile_bytecode(bytecode, farg) 
-    f = @module.get_or_insert_function("vm_func#{@func_n}", Type.function(VALUE, [VALUE]))
+  def self.call_bytecode(bytecode, farg)
+    f = compile_bytecode(bytecode)
+    ExecutionEngine.run_function(f, nil, farg)
+  end
+
+  def self.method_send(recv, compiled_method, farg = nil)
+    ExecutionEngine.run_function(compiled_method, recv, farg)
+  end
+
+  def self.compile_bytecode(bytecode) 
+    f = @module.get_or_insert_function("vm_func#{@func_n}", Type.function(VALUE, [VALUE, VALUE]))
     @func_n += 1
+
+    get_self = f.arguments[0]
 
     entry_block = f.create_block
     b = entry_block.builder
     Builder.set_globals(b)
-    b.push(f.arguments.first)
+    b.push(f.arguments[1])
 
     blocks = bytecode.map { f.create_block } 
     exit_block = f.create_block
@@ -195,15 +206,13 @@ class RubyVM
         cmp = b.icmp_eq(v, 0.llvm)
         b.cond_br(cmp, blocks[arg], blocks[i+1])
       when :getinstancevariable
-        obj = b.pop
         id = b.call(@rb_to_id, arg.llvm)
-        v = b.call(@rb_ivar_get, obj, id)
+        v = b.call(@rb_ivar_get, get_self, id)
         b.push(v)
       when :setinstancevariable
-        new_val = b.pop
-        obj = b.peek
+        new_val = b.peek
         id = b.call(@rb_to_id, arg.llvm)
-        b.call(@rb_ivar_set, obj, id, new_val)
+        b.call(@rb_ivar_set, get_self, id, new_val)
       when :newarray
         ary = b.call(@rb_ary_new)
         b.push(ary)
@@ -226,6 +235,6 @@ class RubyVM
     ret_val = b.pop
     b.return(ret_val)
 
-    ExecutionEngine.run_function(f, farg)
+    f
   end
 end

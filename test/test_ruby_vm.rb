@@ -13,8 +13,8 @@ class RubyVMTests < Test::Unit::TestCase
 
     obj = Object.new
     obj.instance_variable_set(:@shaka, 'khan')
-   
-    assert_equal('khan', RubyVM.compile_bytecode(bytecode, obj))
+    compiled_method = RubyVM.compile_bytecode(bytecode)
+    assert_equal('khan', RubyVM.method_send(obj, compiled_method))
   end
 
   def test_setinstancevariable
@@ -24,7 +24,8 @@ class RubyVMTests < Test::Unit::TestCase
     ]
 
     obj = Object.new
-    RubyVM.compile_bytecode(bytecode, obj)
+    compiled_method = RubyVM.compile_bytecode(bytecode)
+    RubyVM.method_send(obj, compiled_method)
     assert_equal('puter', obj.instance_variable_get(:@fem))
   end
 
@@ -38,7 +39,7 @@ class RubyVMTests < Test::Unit::TestCase
       [:pop]
     ]
   
-    ret = RubyVM.compile_bytecode(bytecode, nil)
+    ret = RubyVM.call_bytecode(bytecode, nil)
     assert_equal(ret, ['shaka'])
   end
 
@@ -49,7 +50,7 @@ class RubyVMTests < Test::Unit::TestCase
         [:putobject, y.immediate],
         [op]
       ]
-      ret = RubyVM.compile_bytecode(bytecode, nil)
+      ret = RubyVM.call_bytecode(bytecode, nil)
       assert_equal(z, ret) 
     end
   end
@@ -83,10 +84,10 @@ class RubyVMTests < Test::Unit::TestCase
       [:opt_length]
     ]
 
-    ret1 = RubyVM.compile_bytecode(bytecode, [])
+    ret1 = RubyVM.call_bytecode(bytecode, [])
     assert_equal(0, ret1)
 
-    ret2 = RubyVM.compile_bytecode(bytecode, [1,2,3,4,5])
+    ret2 = RubyVM.call_bytecode(bytecode, [1,2,3,4,5])
     assert_equal(5, ret2)
   end
 
@@ -100,7 +101,7 @@ class RubyVMTests < Test::Unit::TestCase
       [:branchif, 0]
     ]
 
-    ret = RubyVM.compile_bytecode(bytecode, 6)
+    ret = RubyVM.call_bytecode(bytecode, 6)
     assert_equal(10, ret)
   end
 
@@ -131,7 +132,7 @@ class RubyVMTests < Test::Unit::TestCase
       [:getlocal, 0]
     ]
 
-    ret = RubyVM.compile_bytecode(bytecode, [1,2,3,4,5,6])
+    ret = RubyVM.call_bytecode(bytecode, [1,2,3,4,5,6])
     assert_equal([2,4,6,8,10,12], ret)
   end
 
@@ -140,7 +141,7 @@ class RubyVMTests < Test::Unit::TestCase
       [:send]
     ]
 
-    ret = RubyVM.compile_bytecode(bytecode, nil)
+    ret = RubyVM.call_bytecode(bytecode, nil)
     assert_equal('nil', ret)
   end
 end
