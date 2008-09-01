@@ -44,34 +44,41 @@ class RubyVMTests < Test::Unit::TestCase
     assert_equal(ret, ['shaka'])
   end
 
-  def test_opt_lt
-    bytecode1 = [
-      [:putobject, 0.immediate],
-      [:putobject, 1.immediate],
-      [:opt_lt]
-    ]
-
-    bytecode2 = [
-      [:putobject, 1.immediate],
-      [:putobject, 0.immediate],
-      [:opt_lt]
-    ]
-
-    bytecode3 = [
-      [:putobject, 1.immediate],
-      [:putobject, 1.immediate],
-      [:opt_lt]
-    ]
-
+  def opt_cmp_tester(op, truth_table)
     vm = RubyVM.new
-    ret1 = vm.compile_bytecode(bytecode1, nil)
-    assert_equal(true, ret1)
- 
-    ret2 = vm.compile_bytecode(bytecode2, nil)
-    assert_equal(false, ret2)
+    truth_table.each do |x, y, z|
+      bytecode = [
+        [:putobject, x.immediate],
+        [:putobject, y.immediate],
+        [op]
+      ]
+      ret = vm.compile_bytecode(bytecode, nil)
+      assert_equal(z, ret) 
+    end
+  end
 
-    ret3 = vm.compile_bytecode(bytecode3, nil)
-    assert_equal(false, ret3)
+  def test_opt_lt
+    opt_cmp_tester(:opt_lt, [
+      [0, 1, true],
+      [1, 0, false],
+      [1, 1, false]
+    ])
+  end
+
+  def test_opt_gt
+    opt_cmp_tester(:opt_gt, [
+      [0, 1, false],
+      [1, 0, true],
+      [1, 1, false]
+    ])
+  end
+
+  def test_opt_ge
+    opt_cmp_tester(:opt_ge, [
+      [0, 1, false],
+      [1, 0, true],
+      [1, 1, true]
+    ])
   end
 
   def test_opt_length
@@ -99,10 +106,38 @@ class RubyVMTests < Test::Unit::TestCase
 
     vm = RubyVM.new
     ret = vm.compile_bytecode(bytecode, 6)
-    assert_equal(ret, 10)
+    assert_equal(10, ret)
   end
 
   def test_array_loop
-    
+    bytecode = [
+      [:dup],
+      [:setlocal, 0],
+      [:opt_length],
+      [:putobject, 1.immediate],
+      [:opt_minus],
+      [:dup],
+      [:getlocal, 0],
+      [:swap],
+      [:opt_aref],
+      [:putobject, 2.immediate],
+      [:opt_mult],
+      [:setlocal, 1],
+      [:dup],
+      [:getlocal, 0],
+      [:swap],
+      [:getlocal, 1],
+      [:opt_aset],
+      [:pop],
+      [:dup],
+      [:putobject, 0.immediate],
+      [:opt_gt],
+      [:branchif, 3],
+      [:getlocal, 0]
+    ]
+
+    vm = RubyVM.new
+    ret = vm.compile_bytecode(bytecode, [1,2,3,4,5,6])
+    assert_equal([2,4,6,8,10,12], ret)
   end
 end

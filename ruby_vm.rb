@@ -164,6 +164,24 @@ class RubyVM
         val = b.int_cast(val, LONG, false)
         val = b.mul(val, 2.llvm)
         b.push(val)
+      when :opt_gt
+        obj = b.pop
+        recv = b.pop
+        x = b.fix2int(recv)
+        y = b.fix2int(obj)
+        val = b.icmp_sgt(x, y)
+        val = b.int_cast(val, LONG, false)
+        val = b.mul(val, 2.llvm)
+        b.push(val)
+      when :opt_ge
+        obj = b.pop
+        recv = b.pop
+        x = b.fix2int(recv)
+        y = b.fix2int(obj)
+        val = b.icmp_sge(x, y)
+        val = b.int_cast(val, LONG, false)
+        val = b.mul(val, 2.llvm)
+        b.push(val)
       when :jump
         b.br(blocks[arg])
       when :branchif
