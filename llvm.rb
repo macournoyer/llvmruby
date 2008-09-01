@@ -12,12 +12,21 @@ class Float
   end
 end
 
+class Object
+  def immediate
+    LLVM::Value.get_immediate_constant(self)
+  end
+end
+
 class LLVM::Value
   def llvm
     self
   end
-end
 
+  def immediate
+    self
+  end
+end
 
 module LLVM
   class Builder

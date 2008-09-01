@@ -33,8 +33,8 @@ class RubyVMTests < Test::Unit::TestCase
     bytecode = [
       [:newarray],
       [:dup],
-      [:putobject, LLVM::Value.get_immediate_constant(0)],
-      [:putobject, LLVM::Value.get_immediate_constant('shaka')],
+      [:putobject, 0.immediate],
+      [:putobject, 'shaka'.immediate],
       [:opt_aset],
       [:pop]
     ]
@@ -46,14 +46,20 @@ class RubyVMTests < Test::Unit::TestCase
 
   def test_opt_lt
     bytecode1 = [
-      [:putobject, LLVM::Value.get_immediate_constant(0)],
-      [:putobject, LLVM::Value.get_immediate_constant(1)],
+      [:putobject, 0.immediate],
+      [:putobject, 1.immediate],
       [:opt_lt]
     ]
 
     bytecode2 = [
-      [:putobject, LLVM::Value.get_immediate_constant(1)],
-      [:putobject, LLVM::Value.get_immediate_constant(0)],
+      [:putobject, 1.immediate],
+      [:putobject, 0.immediate],
+      [:opt_lt]
+    ]
+
+    bytecode3 = [
+      [:putobject, 1.immediate],
+      [:putobject, 1.immediate],
       [:opt_lt]
     ]
 
@@ -63,5 +69,23 @@ class RubyVMTests < Test::Unit::TestCase
  
     ret2 = vm.compile_bytecode(bytecode2, nil)
     assert_equal(false, ret2)
+
+    ret3 = vm.compile_bytecode(bytecode3, nil)
+    assert_equal(false, ret3)
+  end
+
+  def test_simple_loop
+    bytecode = [
+      [:putobject, 1.immediate],
+      [:opt_plus],
+      [:dup],
+      [:putobject, 10.immediate],
+      [:opt_lt],
+      [:branchif, 0]
+    ]
+
+    vm = RubyVM.new
+    ret = vm.compile_bytecode(bytecode, 6)
+    assert_equal(ret, 10)
   end
 end

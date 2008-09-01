@@ -155,7 +155,7 @@ class RubyVM
         recv = b.pop
         x = b.fix2int(recv)
         y = b.fix2int(obj)
-        val = b.icmp_sle(x, y)
+        val = b.icmp_slt(x, y)
         val = b.int_cast(val, LONG, false)
         val = b.mul(val, 2.llvm)
         b.push(val)
@@ -163,7 +163,7 @@ class RubyVM
         b.br(blocks[arg])
       when :branchif
         v = b.pop
-        cmp = b.icmp_eq(v, 1.llvm)
+        cmp = b.icmp_eq(v, 0.llvm)
         b.cond_br(cmp, blocks[i+1], blocks[arg])
       when :branchunless
         v = b.pop
