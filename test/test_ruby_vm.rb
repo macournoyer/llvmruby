@@ -8,6 +8,7 @@ RubyVM.start
 class RubyVMTests < Test::Unit::TestCase
   def test_getinstancevariable
     bytecode = [
+      [:putobject, nil.immediate],
       [:getinstancevariable, :@shaka]
     ]
 
@@ -143,5 +144,15 @@ class RubyVMTests < Test::Unit::TestCase
 
     ret = RubyVM.call_bytecode(bytecode, nil)
     assert_equal('nil', ret)
+  end
+
+  def test_putself
+    bytecode = [
+      [:putobject, 5.immediate],
+      [:putself]
+    ]
+    compiled_method = RubyVM.compile_bytecode(bytecode)
+    ret = RubyVM.method_send('me', compiled_method) 
+    assert_equal('me', ret)
   end
 end

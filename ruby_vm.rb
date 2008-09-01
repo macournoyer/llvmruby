@@ -118,6 +118,10 @@ class RubyVM
 
       case op
       when :nop
+      when :putnil
+        b.push(nil.immediate)
+      when :putself
+        b.push(get_self)
       when :putobject
         b.push(arg.llvm)
       when :pop
