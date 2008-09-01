@@ -74,6 +74,19 @@ class RubyVMTests < Test::Unit::TestCase
     assert_equal(false, ret3)
   end
 
+  def test_opt_length
+    bytecode = [
+      [:opt_length]
+    ]
+
+    vm = RubyVM.new 
+    ret1 = vm.compile_bytecode(bytecode, [])
+    assert_equal(0, ret1)
+
+    ret2 = vm.compile_bytecode(bytecode, [1,2,3,4,5])
+    assert_equal(5, ret2)
+  end
+
   def test_simple_loop
     bytecode = [
       [:putobject, 1.immediate],
@@ -87,5 +100,9 @@ class RubyVMTests < Test::Unit::TestCase
     vm = RubyVM.new
     ret = vm.compile_bytecode(bytecode, 6)
     assert_equal(ret, 10)
+  end
+
+  def test_array_loop
+    
   end
 end

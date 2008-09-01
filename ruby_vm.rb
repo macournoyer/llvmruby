@@ -150,6 +150,11 @@ class RubyVM
         ary = b.pop
         b.call(@rb_ary_store, ary, idx, set)
         b.push(set)
+      when :opt_length
+        recv  = b.pop
+        len = b.alen(recv)
+        len = b.num2fix(len)
+        b.push(len)
       when :opt_lt
         obj = b.pop
         recv = b.pop
