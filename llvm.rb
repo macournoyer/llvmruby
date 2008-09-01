@@ -57,6 +57,7 @@ module LLVM
     CHAR = Type::Int8Ty
     P_CHAR = Type::pointer(CHAR)
     LONG = MACHINE_WORD 
+    INT = Type::Int32Ty
     VALUE = MACHINE_WORD
     P_VALUE = Type::pointer(VALUE)
     ID = MACHINE_WORD

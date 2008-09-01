@@ -71,6 +71,7 @@ class RubyVM
     @rb_to_id = @module.external_function('rb_to_id', ftype(VALUE, [VALUE]))
     @rb_ivar_get = @module.external_function('rb_ivar_get', ftype(VALUE, [VALUE, ID]))
     @rb_ivar_set = @module.external_function('rb_ivar_set', ftype(VALUE, [VALUE, ID, VALUE]))
+    @rb_funcall2 = @module.external_function('rb_funcall2', ftype(VALUE, [VALUE, ID, INT, P_VALUE]))
 
     @func_n = 0
   end
@@ -205,6 +206,12 @@ class RubyVM
       when :newarray
         ary = b.call(@rb_ary_new)
         b.push(ary)
+      when :send
+        recv = nil.immediate
+        id = b.call(@rb_to_id, :inspect.immediate)
+        argc = 0.llvm(Type::Int32Ty)
+        val = b.call(@rb_funcall2, recv, id, argc, b.stack)
+        b.push(val)
       else
         raise("Unrecognized op code")
       end

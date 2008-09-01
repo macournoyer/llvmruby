@@ -145,9 +145,12 @@ void Init_llvmruby() {
   rb_define_module_function(cLLVMExecutionEngine, "run_function", llvm_execution_engine_run_function, -1);
   rb_define_module_function(cLLVMExecutionEngine, "run_autoconvert", llvm_execution_engine_run_autoconvert, 1);
 
-  //printf("sizeof long: %d\n", (int)sizeof(long));
-  //printf("sizeof ptr: %d\n", (int)sizeof(long*));
-  //printf("sizeof value: %d\n", (int)sizeof(VALUE));
-  //printf("sizeof array: %d\n", (int)sizeof(struct RArray));
-  //printf("sizeof char: %d\n", (int)sizeof(char));
+  /*
+  printf("sizeof long: %d\n", (int)sizeof(long));
+  printf("sizeof ptr: %d\n", (int)sizeof(long*));
+  printf("sizeof value: %d\n", (int)sizeof(VALUE));
+  printf("sizeof array: %d\n", (int)sizeof(struct RArray));
+  printf("sizeof int: %d\n", (int)sizeof(int));
+  printf("sizeof char: %d\n", (int)sizeof(char));
+  */
 }

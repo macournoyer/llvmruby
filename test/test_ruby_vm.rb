@@ -140,4 +140,14 @@ class RubyVMTests < Test::Unit::TestCase
     ret = vm.compile_bytecode(bytecode, [1,2,3,4,5,6])
     assert_equal([2,4,6,8,10,12], ret)
   end
+
+  def test_send
+    bytecode = [
+      [:send]
+    ]
+
+    vm = RubyVM.new
+    ret = vm.compile_bytecode(bytecode, nil)
+    assert_equal('nil', ret)
+  end
 end
