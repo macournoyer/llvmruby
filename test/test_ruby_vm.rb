@@ -3,6 +3,7 @@ require 'llvm'
 require 'ruby_vm'
 
 include LLVM
+RubyVM.start
 
 class RubyVMTests < Test::Unit::TestCase
   def test_getinstancevariable
@@ -13,8 +14,7 @@ class RubyVMTests < Test::Unit::TestCase
     obj = Object.new
     obj.instance_variable_set(:@shaka, 'khan')
    
-    vm = RubyVM.new
-    assert_equal('khan', vm.compile_bytecode(bytecode, obj))
+    assert_equal('khan', RubyVM.compile_bytecode(bytecode, obj))
   end
 
   def test_setinstancevariable
@@ -24,8 +24,7 @@ class RubyVMTests < Test::Unit::TestCase
     ]
 
     obj = Object.new
-    vm = RubyVM.new
-    vm.compile_bytecode(bytecode, obj)
+    RubyVM.compile_bytecode(bytecode, obj)
     assert_equal('puter', obj.instance_variable_get(:@fem))
   end
 
@@ -39,20 +38,18 @@ class RubyVMTests < Test::Unit::TestCase
       [:pop]
     ]
   
-    vm = RubyVM.new
-    ret = vm.compile_bytecode(bytecode, nil)
+    ret = RubyVM.compile_bytecode(bytecode, nil)
     assert_equal(ret, ['shaka'])
   end
 
   def opt_cmp_tester(op, truth_table)
-    vm = RubyVM.new
     truth_table.each do |x, y, z|
       bytecode = [
         [:putobject, x.immediate],
         [:putobject, y.immediate],
         [op]
       ]
-      ret = vm.compile_bytecode(bytecode, nil)
+      ret = RubyVM.compile_bytecode(bytecode, nil)
       assert_equal(z, ret) 
     end
   end
@@ -86,11 +83,10 @@ class RubyVMTests < Test::Unit::TestCase
       [:opt_length]
     ]
 
-    vm = RubyVM.new 
-    ret1 = vm.compile_bytecode(bytecode, [])
+    ret1 = RubyVM.compile_bytecode(bytecode, [])
     assert_equal(0, ret1)
 
-    ret2 = vm.compile_bytecode(bytecode, [1,2,3,4,5])
+    ret2 = RubyVM.compile_bytecode(bytecode, [1,2,3,4,5])
     assert_equal(5, ret2)
   end
 
@@ -104,8 +100,7 @@ class RubyVMTests < Test::Unit::TestCase
       [:branchif, 0]
     ]
 
-    vm = RubyVM.new
-    ret = vm.compile_bytecode(bytecode, 6)
+    ret = RubyVM.compile_bytecode(bytecode, 6)
     assert_equal(10, ret)
   end
 
@@ -136,8 +131,7 @@ class RubyVMTests < Test::Unit::TestCase
       [:getlocal, 0]
     ]
 
-    vm = RubyVM.new
-    ret = vm.compile_bytecode(bytecode, [1,2,3,4,5,6])
+    ret = RubyVM.compile_bytecode(bytecode, [1,2,3,4,5,6])
     assert_equal([2,4,6,8,10,12], ret)
   end
 
@@ -146,8 +140,7 @@ class RubyVMTests < Test::Unit::TestCase
       [:send]
     ]
 
-    vm = RubyVM.new
-    ret = vm.compile_bytecode(bytecode, nil)
+    ret = RubyVM.compile_bytecode(bytecode, nil)
     assert_equal('nil', ret)
   end
 end

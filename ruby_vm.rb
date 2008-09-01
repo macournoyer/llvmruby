@@ -16,6 +16,11 @@ class Object
   def llvm
     LLVM::Value.get_immediate_constant(self)
   end
+
+  def llvm_send(f)
+    # for now, pass the receiver as the first argument
+    ExecutionEngine.runFunction(f, self)
+  end
 end
 
 class Builder
@@ -62,7 +67,7 @@ class Builder
 end
 
 class RubyVM
-  def initialize
+  def self.start
     @module = LLVM::Module.new('ruby_vm')
     ExecutionEngine.get(@module)
 
@@ -76,15 +81,11 @@ class RubyVM
     @func_n = 0
   end
 
-  def sym2id(sym)
-    (sym.id).llvm(Type::Int64Ty)
-  end
-
-  def ftype(ret, args)
+  def self.ftype(ret, args)
     Type.function(ret, args)
   end
 
-  def compile_bytecode(bytecode, farg) 
+  def self.compile_bytecode(bytecode, farg) 
     f = @module.get_or_insert_function("vm_func#{@func_n}", Type.function(VALUE, [VALUE]))
     @func_n += 1
 
@@ -191,7 +192,7 @@ class RubyVM
         b.cond_br(cmp, blocks[i+1], blocks[arg])
       when :branchunless
         v = b.pop
-        cmp = b.icmp_eq(v, 1.llvm)
+        cmp = b.icmp_eq(v, 0.llvm)
         b.cond_br(cmp, blocks[arg], blocks[i+1])
       when :getinstancevariable
         obj = b.pop
