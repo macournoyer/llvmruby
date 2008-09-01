@@ -155,4 +155,18 @@ class RubyVMTests < Test::Unit::TestCase
     ret = RubyVM.method_send('me', compiled_method) 
     assert_equal('me', ret)
   end
+
+  def test_newhash
+    bytecode = [
+      [:putobject, 'one'.immediate],
+      [:putobject, 1.immediate],
+      [:putobject, 'two'.immediate],
+      [:putobject, 2.immediate],
+      [:putobject, 'three'.immediate],
+      [:putobject, 3.immediate],
+      [:newhash, 6]
+    ]
+    ret = RubyVM.call_bytecode(bytecode, nil)
+    assert_equal({'one' => 1, 'two' => 2, 'three' => 3}, ret)
+  end
 end

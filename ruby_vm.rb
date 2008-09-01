@@ -61,8 +61,200 @@ class Builder
     load(peek_sp)
   end
 
+  def topn(n)
+    sp = load(stack_ptr)
+    idx = sub((-1).llvm(Type::Int32Ty), n)
+    top_sp = gep(sp, idx)
+    load(top_sp)
+  end
+
   def locals
     @@locals
+  end
+end
+
+class OpCodeBuilder
+  def initialize(mod, func, rb_funcs)
+    @mod = mod
+    @func = func
+    @rb_funcs = rb_funcs
+  end
+
+  def get_self
+    @func.arguments.first
+  end
+
+  def nop(b, oprnd)
+  end
+
+  def putnil(b, oprnd)
+    b.push(nil.immediate)
+  end
+
+  def putself(b, oprnd)
+    b.push(get_self)
+  end
+
+  def putobject(b, oprnd)
+    b.push(oprnd.llvm)
+  end
+
+  def pop(b, oprnd)
+    b.pop
+  end
+
+  def dup(b, oprnd)
+    b.push(b.peek)
+  end
+
+  def swap(b, oprn) 
+    v1 = b.pop
+    v2 = b.pop
+    b.push(v1)
+    b.push(v2) 
+  end
+
+  def setlocal(b, oprnd)
+    v = b.pop
+    local_slot = b.gep(b.locals, oprnd.llvm)
+    b.store(v, local_slot)
+  end
+
+  def getlocal(b, oprnd)
+    local_slot = b.gep(b.locals, oprnd.llvm)
+    val = b.load(local_slot)
+    b.push(val)
+  end
+
+  def opt_plus(b, oprnd)
+    v1 = b.fix2int(b.pop)
+    v2 = b.fix2int(b.pop)
+    sum = b.add(v1, v2)
+    b.push(b.num2fix(sum))
+  end
+
+  def opt_minus(b, oprnd)
+    v1 = b.fix2int(b.pop)
+    v2 = b.fix2int(b.pop)
+    sum = b.sub(v2, v1)
+    b.push(b.num2fix(sum))
+  end
+
+  def opt_mult(b, oprnd)
+    v1 = b.fix2int(b.pop)
+    v2 = b.fix2int(b.pop)
+    mul = b.mul(v1, v2)
+    b.push(b.num2fix(mul))
+  end
+
+  def opt_aref(b, oprnd)
+    idx = b.fix2int(b.pop)
+    ary = b.pop
+    out = b.aref(ary, idx)
+    b.push(out)
+  end
+  
+  def opt_aset(b, oprnd)
+    set = b.pop
+    idx = b.fix2int(b.pop)
+    ary = b.pop
+    b.call(@rb_funcs[:rb_ary_store], ary, idx, set)
+    b.push(set)
+  end
+
+  def opt_length(b, oprnd)
+    recv  = b.pop
+    len = b.alen(recv)
+    len = b.num2fix(len)
+    b.push(len)
+  end
+  
+  def opt_lt(b, oprnd)
+    obj = b.pop
+    recv = b.pop
+    x = b.fix2int(recv)
+    y = b.fix2int(obj)
+    val = b.icmp_slt(x, y)
+    val = b.int_cast(val, LONG, false)
+    val = b.mul(val, 2.llvm)
+    b.push(val)
+  end
+  
+  def opt_gt(b, oprnd)
+    obj = b.pop
+    recv = b.pop
+    x = b.fix2int(recv)
+    y = b.fix2int(obj)
+    val = b.icmp_sgt(x, y)
+    val = b.int_cast(val, LONG, false)
+    val = b.mul(val, 2.llvm)
+    b.push(val)
+  end
+
+  def opt_ge(b, oprnd)
+    obj = b.pop
+    recv = b.pop
+    x = b.fix2int(recv)
+    y = b.fix2int(obj)
+    val = b.icmp_sge(x, y)
+    val = b.int_cast(val, LONG, false)
+    val = b.mul(val, 2.llvm)
+    b.push(val)
+  end
+
+  def getinstancevariable(b, oprnd)
+    id = b.call(@rb_funcs[:rb_to_id], oprnd.llvm)
+    v = b.call(@rb_funcs[:rb_ivar_get], get_self, id)
+    b.push(v)
+  end
+ 
+  def setinstancevariable(b, oprnd)
+    new_val = b.peek
+    id = b.call(@rb_funcs[:rb_to_id], oprnd.llvm)
+    b.call(@rb_funcs[:rb_ivar_set], get_self, id, new_val)
+  end
+
+  def newarray(b, oprnd)
+    ary = b.call(@rb_funcs[:rb_ary_new])
+    b.push(ary)
+  end
+ 
+  def newhash(b, oprnd)
+    hash = b.call(@rb_funcs[:rb_hash_new])
+    i = oprnd.llvm(Type::Int32Ty) # This is an integer not a fixnum
+
+    entry_block = @func.create_block
+    loop_block = @func.create_block
+    exit_block = @func.create_block
+
+    b.br(entry_block)
+    b.set_insert_point(entry_block)
+    cmp = b.icmp_sgt(i, 0.llvm(Type::Int32Ty)) 
+    b.cond_br(cmp, loop_block, exit_block)
+
+    b.set_insert_point(loop_block)
+    idx = b.phi(Type::Int32Ty)
+    idx.add_incoming(i, entry_block)
+    next_idx = b.sub(idx, 2.llvm(Type::Int32Ty))
+    idx.add_incoming(next_idx, loop_block)
+
+    n_1 = b.sub(idx, 1.llvm(Type::Int32Ty))
+    n_2 = b.sub(idx, 2.llvm(Type::Int32Ty))
+    b.call(@rb_funcs[:rb_hash_aset], hash, b.topn(n_1), b.topn(n_2))
+    
+    cmp = b.icmp_sgt(next_idx, 0.llvm(Type::Int32Ty))
+    b.cond_br(cmp, loop_block, exit_block)
+
+    b.set_insert_point(exit_block)
+    b.push(hash)
+  end
+
+  def send(b, oprnd)
+    recv = nil.immediate
+    id = b.call(@rb_funcs[:rb_to_id], :inspect.immediate)
+    argc = 0.llvm(Type::Int32Ty)
+    val = b.call(@rb_funcs[:rb_funcall2], recv, id, argc, b.stack)
+    b.push(val)
   end
 end
 
@@ -72,11 +264,24 @@ class RubyVM
     ExecutionEngine.get(@module)
 
     @rb_ary_new = @module.external_function('rb_ary_new', ftype(VALUE, []))
+    @rb_hash_new = @module.external_function('rb_hash_new', ftype(VALUE, []))
+    @rb_hash_aset = @module.external_function('rb_hash_aset', ftype(VALUE, [VALUE, VALUE, VALUE]))
     @rb_ary_store = @module.external_function('rb_ary_store', ftype(VALUE, [VALUE, LONG, VALUE]))
     @rb_to_id = @module.external_function('rb_to_id', ftype(VALUE, [VALUE]))
     @rb_ivar_get = @module.external_function('rb_ivar_get', ftype(VALUE, [VALUE, ID]))
     @rb_ivar_set = @module.external_function('rb_ivar_set', ftype(VALUE, [VALUE, ID, VALUE]))
     @rb_funcall2 = @module.external_function('rb_funcall2', ftype(VALUE, [VALUE, ID, INT, P_VALUE]))
+
+    @rb_funcs = {
+      :rb_ary_new => @rb_ary_new,
+      :rb_hash_new => @rb_hash_new,
+      :rb_hash_aset => @rb_hash_aset,
+      :rb_ary_store => @rb_ary_store,
+      :rb_to_id => @rb_to_id,
+      :rb_ivar_get => @rb_ivar_get,
+      :rb_ivar_set => @rb_ivar_set,
+      :rb_funcall2 => @rb_funcall2
+    }
 
     @func_n = 0
   end
@@ -110,95 +315,15 @@ class RubyVM
     blocks << exit_block
     b.br(blocks.first)
 
+    op_builder = OpCodeBuilder.new(@module, f, @rb_funcs)
+
     bytecode.each_with_index do |opcode, i|
       op, arg = opcode
 
       block = blocks[i] 
-      b = block.builder
+      b.set_insert_point(block)
 
       case op
-      when :nop
-      when :putnil
-        b.push(nil.immediate)
-      when :putself
-        b.push(get_self)
-      when :putobject
-        b.push(arg.llvm)
-      when :pop
-        b.pop
-      when :dup
-        b.push(b.peek)
-      when :swap
-        v1 = b.pop
-        v2 = b.pop
-        b.push(v1)
-        b.push(v2)
-      when :setlocal
-        v = b.pop
-        local_slot = b.gep(b.locals, arg.llvm)
-        b.store(v, local_slot)
-      when :getlocal
-        local_slot = b.gep(b.locals, arg.llvm)
-        val = b.load(local_slot)
-        b.push(val)
-      when :opt_plus
-        v1 = b.fix2int(b.pop)
-        v2 = b.fix2int(b.pop)
-        sum = b.add(v1, v2)     
-        b.push(b.num2fix(sum))
-      when :opt_minus
-        v1 = b.fix2int(b.pop)
-        v2 = b.fix2int(b.pop)
-        sum = b.sub(v2, v1)
-        b.push(b.num2fix(sum))
-      when :opt_mult
-        v1 = b.fix2int(b.pop)
-        v2 = b.fix2int(b.pop)
-        mul = b.mul(v1, v2)
-        b.push(b.num2fix(mul))
-      when :opt_aref
-        idx = b.fix2int(b.pop)
-        ary = b.pop
-        out = b.aref(ary, idx)
-        b.push(out)
-      when :opt_aset
-        set = b.pop
-        idx = b.fix2int(b.pop)
-        ary = b.pop
-        b.call(@rb_ary_store, ary, idx, set)
-        b.push(set)
-      when :opt_length
-        recv  = b.pop
-        len = b.alen(recv)
-        len = b.num2fix(len)
-        b.push(len)
-      when :opt_lt
-        obj = b.pop
-        recv = b.pop
-        x = b.fix2int(recv)
-        y = b.fix2int(obj)
-        val = b.icmp_slt(x, y)
-        val = b.int_cast(val, LONG, false)
-        val = b.mul(val, 2.llvm)
-        b.push(val)
-      when :opt_gt
-        obj = b.pop
-        recv = b.pop
-        x = b.fix2int(recv)
-        y = b.fix2int(obj)
-        val = b.icmp_sgt(x, y)
-        val = b.int_cast(val, LONG, false)
-        val = b.mul(val, 2.llvm)
-        b.push(val)
-      when :opt_ge
-        obj = b.pop
-        recv = b.pop
-        x = b.fix2int(recv)
-        y = b.fix2int(obj)
-        val = b.icmp_sge(x, y)
-        val = b.int_cast(val, LONG, false)
-        val = b.mul(val, 2.llvm)
-        b.push(val)
       when :jump
         b.br(blocks[arg])
       when :branchif
@@ -209,25 +334,8 @@ class RubyVM
         v = b.pop
         cmp = b.icmp_eq(v, 0.llvm)
         b.cond_br(cmp, blocks[arg], blocks[i+1])
-      when :getinstancevariable
-        id = b.call(@rb_to_id, arg.llvm)
-        v = b.call(@rb_ivar_get, get_self, id)
-        b.push(v)
-      when :setinstancevariable
-        new_val = b.peek
-        id = b.call(@rb_to_id, arg.llvm)
-        b.call(@rb_ivar_set, get_self, id, new_val)
-      when :newarray
-        ary = b.call(@rb_ary_new)
-        b.push(ary)
-      when :send
-        recv = nil.immediate
-        id = b.call(@rb_to_id, :inspect.immediate)
-        argc = 0.llvm(Type::Int32Ty)
-        val = b.call(@rb_funcall2, recv, id, argc, b.stack)
-        b.push(val)
       else
-        raise("Unrecognized op code")
+        op_builder.__send__(op, b, arg)
       end
 
       if op != :jump && op != :branchif && op != :branchunless
