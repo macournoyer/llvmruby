@@ -220,4 +220,12 @@ class BasicTests < Test::Unit::TestCase
     assert_match(/define i32 @inspect\(\)/, m.inspect)
     assert_match(/define i32 @inspect\(\)/, f.inspect)
   end
+
+  def test_global_strings
+    m = LLVM::Module.new('globalstrings')
+    ftype = Type.function(Type::Int32Ty, [])
+    f = m.get_or_insert_function('use_global_strings', ftype)
+    b = f.create_block.builder
+    v = b.create_global_string_ptr("SHAKA KHAN")
+  end
 end

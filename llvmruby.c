@@ -59,6 +59,7 @@ VALUE llvm_builder_int_to_ptr(VALUE, VALUE, VALUE);
 VALUE llvm_builder_int_cast(VALUE, VALUE, VALUE);
 VALUE llvm_builder_call(int, VALUE*, VALUE);
 VALUE llvm_builder_get_global(VALUE);
+VALUE llvm_builder_create_global_string_ptr(VALUE);
 
 VALUE llvm_value_get_constant(VALUE);
 VALUE llvm_value_get_float_constant(VALUE);
@@ -140,6 +141,7 @@ void Init_llvmruby() {
   rb_define_method(cLLVMBuilder, "int_cast", llvm_builder_int_cast, 3);
   rb_define_method(cLLVMBuilder, "call", llvm_builder_call, -1);
   rb_define_method(cLLVMBuilder, "get_global", llvm_builder_get_global, 0);
+  rb_define_method(cLLVMBuilder, "create_global_string_ptr", llvm_builder_create_global_string_ptr, 1);
 
   rb_define_method(cLLVMPhi, "add_incoming", llvm_phi_add_incoming, 2);
 

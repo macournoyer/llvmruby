@@ -187,4 +187,11 @@ llvm_builder_get_global(VALUE self) {
   GlobalVariable *g = new GlobalVariable(Type::Int64Ty, false, GlobalValue::ExternalLinkage, 0, "shakalaka");
   return llvm_value_wrap(g);
 }
+
+VALUE
+llvm_builder_create_global_string_ptr(VALUE self, VALUE str) {
+  DATA_GET_BUILDER
+  Value *v = builder->CreateGlobalStringPtr(StringValuePtr(str));
+  return llvm_value_wrap(v);
+}
 }
