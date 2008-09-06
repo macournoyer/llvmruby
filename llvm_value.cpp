@@ -61,14 +61,18 @@ llvm_type_vector(VALUE self, VALUE rtype, VALUE size) {
 }
 
 VALUE
-llvm_type_function(VALUE self, VALUE rret_type, VALUE rarg_types) {
+llvm_type_function(int argc, VALUE *argv, VALUE self) {
+  VALUE rret_type, rarg_types, var_args;
+
+  rb_scan_args(argc, argv, "21", &rret_type, &rarg_types, &var_args);
+
   std::vector<const Type*> arg_types;
   for(int i = 0; i < RARRAY_LEN(rarg_types); ++i) {
     VALUE v = RARRAY_PTR(rarg_types)[i];
     arg_types.push_back(LLVM_TYPE(v));
   }
   const Type *ret_type = LLVM_TYPE(rret_type);
-  FunctionType *ftype = FunctionType::get(ret_type, arg_types, false);
+  FunctionType *ftype = FunctionType::get(ret_type, arg_types, RTEST(var_args));
   return Data_Wrap_Struct(cLLVMFunctionType, NULL, NULL, ftype);
 }
 

@@ -23,7 +23,8 @@ VALUE llvm_type_pointer(VALUE, VALUE);
 VALUE llvm_type_struct(VALUE, VALUE, VALUE);
 VALUE llvm_type_array(VALUE, VALUE, VALUE);
 VALUE llvm_type_vector(VALUE, VALUE, VALUE);
-VALUE llvm_type_function(VALUE, VALUE);
+VALUE llvm_type_function2(VALUE, VALUE);
+VALUE llvm_type_function(VALUE, VALUE, VALUE);
 
 void init_instructions();
 
@@ -102,7 +103,7 @@ void Init_llvmruby() {
   rb_define_module_function(cLLVMType, "struct", llvm_type_struct, 1);
   rb_define_module_function(cLLVMType, "array", llvm_type_array, 2);
   rb_define_module_function(cLLVMType, "vector", llvm_type_vector, 2);
-  rb_define_module_function(cLLVMType, "function", llvm_type_function, 2);
+  rb_define_module_function(cLLVMType, "function", llvm_type_function, -1);
 
   rb_define_module_function(cLLVMValue, "get_constant", llvm_value_get_constant, 2);
   rb_define_module_function(cLLVMValue, "get_float_constant", llvm_value_get_float_constant, 1);

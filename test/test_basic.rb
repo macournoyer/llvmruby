@@ -228,4 +228,8 @@ class BasicTests < Test::Unit::TestCase
     b = f.create_block.builder
     v = b.create_global_string_ptr("SHAKA KHAN")
   end
+
+  def test_var_arg_ftypes
+    ftype = Type.function(Type::Int32Ty, [], true)
+  end
 end
