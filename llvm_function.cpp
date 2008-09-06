@@ -1,4 +1,5 @@
 #include "llvmruby.h"
+#include <sstream>
 
 extern "C" {
 VALUE 
@@ -22,5 +23,13 @@ llvm_function_arguments(VALUE self) {
     rb_ary_push(arg_array, llvm_value_wrap(arg));
   }
   return arg_array;
+}
+
+VALUE
+llvm_function_inspect(VALUE self) {
+  Function *f = LLVM_FUNCTION(self); 
+  std::ostringstream strstrm;
+  strstrm << *f;
+  return rb_str_new2(strstrm.str().c_str());
 }
 }

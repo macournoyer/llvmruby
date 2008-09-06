@@ -210,14 +210,14 @@ class BasicTests < Test::Unit::TestCase
     assert_raise(TypeError) { b.bin_op(Instruction::Add, 3.llvm, 5) }
   end
 
-  def test_module_to_s
+  def test_inspectors
     m = LLVM::Module.new('example')
     ftype = Type.function(Type::Int32Ty, [])
-    f = m.get_or_insert_function('to_s', ftype)
+    f = m.get_or_insert_function('inspect', ftype)
     b = f.create_block.builder
     b.return(5.llvm(Type::Int32Ty))
     
-    str = m.to_s
-    assert_match(/define i32 @to_s\(\)/, str)
+    assert_match(/define i32 @inspect\(\)/, m.inspect)
+    assert_match(/define i32 @inspect\(\)/, f.inspect)
   end
 end

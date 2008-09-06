@@ -38,7 +38,7 @@ llvm_module_get_function(VALUE self, VALUE name) {
 }
 
 VALUE
-llvm_module_to_s(VALUE self) {
+llvm_module_inspect(VALUE self) {
   Module *m = LLVM_MODULE(self);
   std::ostringstream strstrm;
   strstrm << *m;
