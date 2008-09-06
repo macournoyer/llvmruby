@@ -28,6 +28,13 @@ llvm_module_get_or_insert_function(VALUE self, VALUE name, VALUE rtype) {
   return llvm_function_wrap(f); 
 }
 
+VALUE
+llvm_module_get_function(VALUE self, VALUE name) {
+  Check_Type(name, T_STRING);
+  Module *m = LLVM_MODULE(self);
+  Function *f = m->getFunction(StringValuePtr(name));
+  return llvm_function_wrap(f);  
+}
 
 VALUE
 llvm_pass_manager_allocate(VALUE klass) {
