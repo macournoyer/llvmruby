@@ -2,6 +2,7 @@
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/Analysis/Verifier.h"
 #include <fstream>
+#include <sstream>
 
 extern "C" {
 
@@ -34,6 +35,14 @@ llvm_module_get_function(VALUE self, VALUE name) {
   Module *m = LLVM_MODULE(self);
   Function *f = m->getFunction(StringValuePtr(name));
   return llvm_function_wrap(f);  
+}
+
+VALUE
+llvm_module_to_s(VALUE self) {
+  Module *m = LLVM_MODULE(self);
+  std::ostringstream strstrm;
+  strstrm << *m;
+  return rb_str_new2(strstrm.str().c_str());
 }
 
 VALUE
