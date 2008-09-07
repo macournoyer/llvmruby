@@ -12,6 +12,7 @@ PRSTRING = Type.pointer(RSTRING)
 class MethodTable
   attr_accessor(:types)
   attr_reader(:funcs)
+  attr_reader(:obj_type)
 
   def initialize(name, m, obj_type, t)
     funcs= {}
@@ -22,6 +23,7 @@ class MethodTable
       funcs[k] = m.get_or_insert_function(fname, ftype)
     end
     @funcs = funcs
+    @obj_type = obj_type
   end
 end
 
@@ -45,6 +47,27 @@ class Compiler
 
     ftype = Type.function(INT, [PCHAR])
     @strlen = @module.external_function('strlen', ftype)
+
+    classes = {
+      :Num => create_num_methods,
+      :String => create_str_methods
+    }
+    @classes = classes
+
+    ftype = Type.function(PRSTRING, [PCHAR])
+    @str_from_cstr = @module.get_or_insert_function('String_str_from_cstr', ftype)
+    str_from_cstr = @str_from_cstr
+    cstr = str_from_cstr.arguments.first
+    b = str_from_cstr.create_block.builder
+    len = b.call(@strlen, cstr)
+    str_obj = b.malloc(RSTRING, 1)
+    str_len = b.struct_gep(str_obj, 0)
+    b.store(len, str_len)
+    str_ptr = b.struct_gep(str_obj, 1)
+    b.store(cstr, str_ptr)
+    b.return(str_obj)
+
+    @variables = {}
   end
 
   def create_num_methods
@@ -156,48 +179,60 @@ class Compiler
         num_obj.methods = classes[:Num]
         num_obj.value = val
         num_obj
+      when :lasgn
+        var_name = sexpr.shift
+        val = parse_sexpr(sexpr.shift, b)
+        var = @variables[var_name]
+        unless var
+          puts "Creating local variable #{var_name.inspect}"
+          puts "New object type: #{val.methods.obj_type}"
+          var = RObject.new
+          var.methods = val.methods
+          var.value = b.alloca(val.methods.obj_type, 1)
+        end
+        b.store(val.value, var.value)
+        @variables[var_name] = var
+        val
+      when :lvar
+        var_name = sexpr.shift
+        var = @variables[var_name]
+        obj = RObject.new
+        obj.methods = var.methods
+        obj.value = b.load(var.value)
+        obj
       else
         puts "diggin deeper..."
         sexpr.each {|s| parse_sexpr(s, b) if Array === s }
     end
   end
 
-  def compile
-    classes = {
-      :Num => create_num_methods,
-      :String => create_str_methods 
-    }
-    @classes = classes
-
-    ftype = Type.function(PRSTRING, [PCHAR])
-    @str_from_cstr = @module.get_or_insert_function('String_str_from_cstr', ftype)
-    str_from_cstr = @str_from_cstr
-    cstr = str_from_cstr.arguments.first
-    b = str_from_cstr.create_block.builder
-    len = b.call(@strlen, cstr) 
-    str_obj = b.malloc(RSTRING, 1)
-    str_len = b.struct_gep(str_obj, 0)
-    b.store(len, str_len)
-    str_ptr = b.struct_gep(str_obj, 1)
-    b.store(cstr, str_ptr)
-    b.return(str_obj)
-
+  def compile(sexpr)
     main_type = Type.function(INT, [INT, Type.pointer(PCHAR)])
     main = @module.get_or_insert_function('main', main_type)
     b = main.create_block.builder
 
-    #sexpr = [:defn, :omg, [:scope, [:block, [:args], [:str, "sheemak"]]]]
-    #sexpr = [:call, [:call, [:call, [:str, "sheemak"], :length], :to_s], :puts]
-    #sexpr = [:call, [:call, [:call, [:str, "sheemak"], :length], :to_s], :puts]
-    sexpr = [:call, [:call, [:call, [:lit, 2], :+, [:array, [:lit, 3]]], :to_s], :puts]
-    #sexpr = [:call, [:call, [:lit, 666], :to_s], :puts]
-  
     parse_sexpr(sexpr, b)
     b.return(0.llvm(INT))
 
+    puts @module.inspect
     @module.write_bitcode("main.o")
   end
 end
 
+#sexpr = [:defn, :omg, [:scope, [:block, [:args], [:str, "sheemak"]]]]
+#sexpr = [:call, [:call, [:call, [:str, "sheemak"], :length], :to_s], :puts]
+#sexpr = [:call, [:call, [:call, [:str, "sheemak"], :length], :to_s], :puts]
+#sexpr = [:call, [:call, [:lit, 666], :to_s], :puts]
+#sexpr = [:call, [:call, [:call, [:lit, 2], :+, [:array, [:lit, 3]]], :to_s], :puts]
+#sexpr = [:lasgn, :x, [:lit, 23]]
+#sexpr = [:block, [:lasgn, :x, [:lit, 23]], [:call, [:str, "shaka khan"], :puts]]
+#sexpr = [:block, [:lasgn, :x, [:lit, 23]], [:call, [:call, [:lvar, :x], :to_s], :puts]]
+sexpr = [:block, 
+  [:lasgn, :x, [:lit, 2]], 
+  [:lasgn, :y, [:lit, 3]],
+  [:lasgn, :x, [:call, [:lvar, :x], :+, [:array, [:lvar, :y]]]],
+  [:call, [:call, [:lvar, :x], :to_s], :puts]
+]
+
 compiler = Compiler.new
-compiler.compile
+compiler.compile(sexpr)
