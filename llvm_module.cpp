@@ -38,6 +38,16 @@ llvm_module_get_function(VALUE self, VALUE name) {
 }
 
 VALUE
+llvm_module_global_variable(VALUE self, VALUE rtype, VALUE rinitializer) {
+  Module *m = LLVM_MODULE(self);
+  Type *type = LLVM_TYPE(rtype);
+  Constant *initializer = (Constant*)DATA_PTR(rinitializer);
+  GlobalVariable *gv = new GlobalVariable(type, true, GlobalValue::InternalLinkage, initializer, "", m);
+  return llvm_value_wrap(gv);
+}
+
+
+VALUE
 llvm_module_inspect(VALUE self) {
   Module *m = LLVM_MODULE(self);
   std::ostringstream strstrm;

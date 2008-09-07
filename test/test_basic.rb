@@ -238,5 +238,9 @@ class BasicTests < Test::Unit::TestCase
     struct_type = Type.struct([int_t, int_t, int_t])
     struct_const = Value.get_struct_constant(struct_type, 2.llvm(int_t), 3.llvm(int_t), 5.llvm(int_t))
     assert_kind_of(Value, struct_const)
+
+    m = LLVM::Module.new('globals')
+    gv = m.global_variable(struct_type, struct_const)
+    assert_kind_of(Value, gv)
   end
 end
