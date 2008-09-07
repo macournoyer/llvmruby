@@ -51,6 +51,8 @@ VALUE llvm_builder_return(VALUE, VALUE);
 VALUE llvm_builder_br(VALUE, VALUE);
 VALUE llvm_builder_cond_br(VALUE, VALUE, VALUE, VALUE);
 
+VALUE llvm_builder_malloc(VALUE, VALUE, VALUE);
+VALUE llvm_builder_free(VALUE, VALUE);
 VALUE llvm_builder_alloca(VALUE, VALUE, VALUE);
 VALUE llvm_builder_load(VALUE, VALUE);
 VALUE llvm_builder_store(VALUE, VALUE, VALUE);
@@ -135,6 +137,8 @@ void Init_llvmruby() {
   rb_define_method(cLLVMBuilder, "return", llvm_builder_return, 1);
   rb_define_method(cLLVMBuilder, "br", llvm_builder_br, 1);
   rb_define_method(cLLVMBuilder, "cond_br", llvm_builder_cond_br, 3);
+  rb_define_method(cLLVMBuilder, "malloc", llvm_builder_malloc, 2);
+  rb_define_method(cLLVMBuilder, "free", llvm_builder_free, 1);
   rb_define_method(cLLVMBuilder, "alloca", llvm_builder_alloca, 2);
   rb_define_method(cLLVMBuilder, "load", llvm_builder_load, 1);
   rb_define_method(cLLVMBuilder, "store", llvm_builder_store, 2);

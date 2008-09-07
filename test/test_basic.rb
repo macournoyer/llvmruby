@@ -243,4 +243,15 @@ class BasicTests < Test::Unit::TestCase
     gv = m.global_variable(struct_type, struct_const)
     assert_kind_of(Value, gv)
   end
+
+  def test_malloc_free
+    function_tester(23) do |f|
+      b = f.create_block.builder
+      new_space = b.malloc(MACHINE_WORD, 1)
+      b.store(23.llvm(MACHINE_WORD), new_space)    
+      v = b.load(new_space)
+      b.free(new_space)
+      b.return(v)
+    end
+  end
 end

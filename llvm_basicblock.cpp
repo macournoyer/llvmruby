@@ -90,6 +90,26 @@ llvm_builder_cond_br(VALUE self, VALUE rcond, VALUE rtrue_block, VALUE rfalse_bl
 
   return llvm_value_wrap(builder->CreateCondBr(cond, true_block, false_block));
 }
+
+VALUE
+llvm_builder_malloc(VALUE self, VALUE rtype, VALUE rsize) {
+  DATA_GET_BUILDER
+
+  const Type *type;
+  Data_Get_Struct(rtype, Type, type);
+
+  Value *size = ConstantInt::get(Type::Int32Ty, FIX2INT(rsize));
+  Value *v = builder->CreateMalloc(type, size);
+  return llvm_value_wrap(v);
+}
+
+VALUE
+llvm_builder_free(VALUE self, VALUE rptr) {
+   DATA_GET_BUILDER
+   Value *v = LLVM_VAL(rptr);
+   builder->CreateFree(v);
+   return Qtrue;
+}
   
 VALUE 
 llvm_builder_alloca(VALUE self, VALUE rtype, VALUE rsize) {
