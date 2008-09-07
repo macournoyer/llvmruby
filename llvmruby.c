@@ -65,6 +65,7 @@ VALUE llvm_builder_create_global_string_ptr(VALUE);
 VALUE llvm_value_get_constant(VALUE);
 VALUE llvm_value_get_float_constant(VALUE);
 VALUE llvm_value_get_immediate_constant(VALUE);
+VALUE llvm_value_get_struct_constant(int, VALUE*, VALUE);
 
 VALUE llvm_phi_add_incoming(VALUE, VALUE, VALUE);
 
@@ -108,6 +109,7 @@ void Init_llvmruby() {
   rb_define_module_function(cLLVMValue, "get_constant", llvm_value_get_constant, 2);
   rb_define_module_function(cLLVMValue, "get_float_constant", llvm_value_get_float_constant, 1);
   rb_define_module_function(cLLVMValue, "get_immediate_constant", llvm_value_get_immediate_constant, 1);
+  rb_define_module_function(cLLVMValue, "get_struct_constant", llvm_value_get_struct_constant, -1);
 
   init_instructions();
 

@@ -232,4 +232,11 @@ class BasicTests < Test::Unit::TestCase
   def test_var_arg_ftypes
     ftype = Type.function(Type::Int32Ty, [], true)
   end
+
+  def test_struct_constants
+    int_t = Type::Int32Ty
+    struct_type = Type.struct([int_t, int_t, int_t])
+    struct_const = Value.get_struct_constant(struct_type, 2.llvm(int_t), 3.llvm(int_t), 5.llvm(int_t))
+    assert_kind_of(Value, struct_const)
+  end
 end

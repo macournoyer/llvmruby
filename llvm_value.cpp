@@ -1,19 +1,35 @@
 #include "llvmruby.h"
 
 extern "C" {
-VALUE llvm_value_wrap(Value* v) { 
+VALUE 
+llvm_value_wrap(Value* v) { 
   return Data_Wrap_Struct(cLLVMValue, NULL, NULL, v); 
 }
 
-VALUE llvm_value_get_constant(VALUE self, VALUE type, VALUE v) {
+VALUE 
+llvm_value_get_constant(VALUE self, VALUE type, VALUE v) {
   return llvm_value_wrap(ConstantInt::get(LLVM_TYPE(type), FIX2INT(v)));
 }
 
-VALUE llvm_value_get_float_constant(VALUE self, VALUE v) {
+VALUE 
+llvm_value_get_float_constant(VALUE self, VALUE v) {
   return llvm_value_wrap(ConstantFP::get(Type::FloatTy, RFLOAT(v)->value));
 }
 
-VALUE llvm_value_get_immediate_constant(VALUE self, VALUE v) {
+VALUE
+llvm_value_get_struct_constant(int argc, VALUE *argv, VALUE self) {
+  StructType *t = (StructType*)DATA_PTR(argv[0]);
+  std::vector<Constant*> vals;
+
+  for(int i = 1; i < argc; ++i) {
+    Constant *c = (Constant*)DATA_PTR(argv[i]);
+    vals.push_back(c);
+  }
+  return llvm_value_wrap(ConstantStruct::get(t, vals));
+}
+
+VALUE 
+llvm_value_get_immediate_constant(VALUE self, VALUE v) {
   const IntegerType* type; 
   if(sizeof(VALUE) == 4) {
     type = Type::Int32Ty;
@@ -23,7 +39,8 @@ VALUE llvm_value_get_immediate_constant(VALUE self, VALUE v) {
   return llvm_value_wrap(ConstantInt::get(type, (long)v));
 }
 
-VALUE llvm_type_pointer(VALUE self, VALUE rtype) {
+VALUE 
+llvm_type_pointer(VALUE self, VALUE rtype) {
   Type *type;
   Data_Get_Struct(rtype, Type, type);
   Type* ptr_type = PointerType::getUnqual(type);
