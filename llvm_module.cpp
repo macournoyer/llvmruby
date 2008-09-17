@@ -1,6 +1,7 @@
 #include "llvmruby.h"
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/Analysis/Verifier.h"
+#include "llvm/Support/MemoryBuffer.h"
 #include <fstream>
 #include <sstream>
 
@@ -117,6 +118,17 @@ llvm_module_external_function(VALUE self, VALUE name, VALUE type) {
   );
   return Data_Wrap_Struct(cLLVMFunction, NULL, NULL, f);
 }
+
+VALUE
+llvm_module_read_bitcode(VALUE self, VALUE bitcode) {
+  Check_Type(bitcode, T_STRING);
+
+  MemoryBuffer *buf = MemoryBuffer::getMemBufferCopy(RSTRING(bitcode)->ptr,RSTRING(bitcode)->ptr+RSTRING(bitcode)->len);
+  Module *module = ParseBitcodeFile(buf);
+  delete buf;
+  return Data_Wrap_Struct(cLLVMModule, NULL, NULL, module);
+}
+
 
 VALUE
 llvm_module_write_bitcode(VALUE self, VALUE file_name) {
