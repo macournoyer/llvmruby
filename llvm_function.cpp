@@ -32,4 +32,17 @@ llvm_function_inspect(VALUE self) {
   strstrm << *f;
   return rb_str_new2(strstrm.str().c_str());
 }
+
+VALUE
+llvm_function_get_basic_block_list(VALUE self) {
+  Function *f = LLVM_FUNCTION(self);
+  VALUE bb_array = rb_ary_new();
+  Function::iterator bbs = f->begin();
+  while(bbs != f->end()) {
+    BasicBlock *bb = bbs++;
+    rb_ary_push(bb_array, llvm_basic_block_wrap(bb));
+  }
+  return bb_array;
+}
+
 }

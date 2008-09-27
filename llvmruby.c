@@ -43,8 +43,10 @@ VALUE llvm_function_allocate(VALUE);
 VALUE llvm_function_create_block(VALUE);
 VALUE llvm_function_arguments(VALUE);
 VALUE llvm_function_inspect(VALUE);
+VALUE llvm_function_get_basic_block_list(VALUE);
 
 VALUE llvm_basic_block_builder(VALUE);
+VALUE llvm_basic_block_size(VALUE);
 
 VALUE llvm_builder_set_insert_point(VALUE, VALUE);
 VALUE llvm_builder_bin_op(VALUE, VALUE, VALUE, VALUE);
@@ -71,6 +73,8 @@ VALUE llvm_value_get_constant(VALUE);
 VALUE llvm_value_get_float_constant(VALUE);
 VALUE llvm_value_get_immediate_constant(VALUE);
 VALUE llvm_value_get_struct_constant(int, VALUE*, VALUE);
+VALUE llvm_value_get_name(VALUE);
+
 
 VALUE llvm_phi_add_incoming(VALUE, VALUE, VALUE);
 
@@ -115,6 +119,7 @@ void Init_llvmruby() {
   rb_define_module_function(cLLVMValue, "get_float_constant", llvm_value_get_float_constant, 1);
   rb_define_module_function(cLLVMValue, "get_immediate_constant", llvm_value_get_immediate_constant, 1);
   rb_define_module_function(cLLVMValue, "get_struct_constant", llvm_value_get_struct_constant, -1);
+  rb_define_method(cLLVMValue, "get_name", llvm_value_get_name, 0);
 
   init_instructions();
 
@@ -132,8 +137,10 @@ void Init_llvmruby() {
   rb_define_method(cLLVMFunction, "create_block", llvm_function_create_block, 0);
   rb_define_method(cLLVMFunction, "arguments", llvm_function_arguments, 0);
   rb_define_method(cLLVMFunction, "inspect", llvm_function_inspect, 0);
+  rb_define_method(cLLVMFunction, "get_basic_block_list", llvm_function_get_basic_block_list, 0);
 
   rb_define_method(cLLVMBasicBlock, "builder", llvm_basic_block_builder, 0);
+  rb_define_method(cLLVMBasicBlock, "size", llvm_basic_block_size, 0);
 
   rb_define_method(cLLVMBuilder, "set_insert_point", llvm_builder_set_insert_point, 1);
   rb_define_method(cLLVMBuilder, "bin_op", llvm_builder_bin_op, 3);

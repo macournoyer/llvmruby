@@ -9,6 +9,12 @@ llvm_basic_block_wrap(BasicBlock* bb) {
   return Data_Wrap_Struct(cLLVMBasicBlock, NULL, NULL, bb); 
 }
 
+VALUE
+llvm_basic_block_size(VALUE self) {
+  BasicBlock *bb = LLVM_BASIC_BLOCK(self);
+  return INT2NUM(bb->size());
+}
+
 VALUE 
 llvm_basic_block_builder(VALUE self) {
   BasicBlock* bb;
