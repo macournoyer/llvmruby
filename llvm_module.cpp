@@ -1,4 +1,5 @@
 #include "llvmruby.h"
+#include "llvm/Assembly/Parser.h"
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/Analysis/Verifier.h"
 #include "llvm/Support/MemoryBuffer.h"
@@ -117,6 +118,20 @@ llvm_module_external_function(VALUE self, VALUE name, VALUE type) {
     module
   );
   return Data_Wrap_Struct(cLLVMFunction, NULL, NULL, f);
+}
+
+VALUE
+llvm_module_read_assembly(VALUE self, VALUE assembly) {
+  Check_Type(assembly, T_STRING);
+
+  ParseError e;
+  Module *module = ParseAssemblyString(
+    StringValuePtr(assembly),
+    LLVM_MODULE(self),
+    &e
+  );
+  //TODO How do we handle errors?
+  return Data_Wrap_Struct(cLLVMModule, NULL, NULL, module);
 }
 
 VALUE

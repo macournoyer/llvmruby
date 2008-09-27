@@ -34,6 +34,7 @@ VALUE llvm_module_get_or_insert_function(VALUE, VALUE);
 VALUE llvm_module_get_function(VALUE, VALUE);
 VALUE llvm_module_global_variable(VALUE, VALUE, VALUE);
 VALUE llvm_module_external_function(VALUE, VALUE, VALUE);
+VALUE llvm_module_read_assembly(VALUE, VALUE);
 VALUE llvm_module_read_bitcode(VALUE, VALUE);
 VALUE llvm_module_write_bitcode(VALUE, VALUE);
 VALUE llvm_module_inspect(VALUE);
@@ -117,7 +118,8 @@ void Init_llvmruby() {
 
   init_instructions();
 
-  rb_define_alloc_func(cLLVMModule, llvm_module_allocate); 
+  rb_define_alloc_func(cLLVMModule, llvm_module_allocate);
+  rb_define_module_function(cLLVMModule, "read_assembly", llvm_module_read_assembly, 1);
   rb_define_module_function(cLLVMModule, "read_bitcode", llvm_module_read_bitcode, 1);
   rb_define_method(cLLVMModule, "initialize", llvm_module_initialize, 1);
   rb_define_method(cLLVMModule, "get_or_insert_function", llvm_module_get_or_insert_function, 2);
