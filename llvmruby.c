@@ -47,6 +47,11 @@ VALUE llvm_function_get_basic_block_list(VALUE);
 
 VALUE llvm_basic_block_builder(VALUE);
 VALUE llvm_basic_block_size(VALUE);
+VALUE llvm_basic_block_get_instruction_list(VALUE);
+
+VALUE llvm_instruction_inspect(VALUE);
+VALUE llvm_instruction_get_opcode_name(VALUE);
+
 
 VALUE llvm_builder_set_insert_point(VALUE, VALUE);
 VALUE llvm_builder_bin_op(VALUE, VALUE, VALUE, VALUE);
@@ -141,6 +146,10 @@ void Init_llvmruby() {
 
   rb_define_method(cLLVMBasicBlock, "builder", llvm_basic_block_builder, 0);
   rb_define_method(cLLVMBasicBlock, "size", llvm_basic_block_size, 0);
+  rb_define_method(cLLVMBasicBlock, "get_instruction_list", llvm_basic_block_get_instruction_list, 0);
+
+  rb_define_method(cLLVMInstruction, "inspect", llvm_instruction_inspect, 0);
+  rb_define_method(cLLVMInstruction, "get_opcode_name", llvm_instruction_get_opcode_name, 0);
 
   rb_define_method(cLLVMBuilder, "set_insert_point", llvm_builder_set_insert_point, 1);
   rb_define_method(cLLVMBuilder, "bin_op", llvm_builder_bin_op, 3);

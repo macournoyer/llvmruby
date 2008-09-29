@@ -15,6 +15,18 @@ llvm_basic_block_size(VALUE self) {
   return INT2NUM(bb->size());
 }
 
+VALUE
+llvm_basic_block_get_instruction_list(VALUE self) {
+  BasicBlock *bb = LLVM_BASIC_BLOCK(self);
+  VALUE ins_array = rb_ary_new();
+  BasicBlock::iterator ins = bb->begin();
+  while(ins != bb->end()) {
+    Instruction *i = ins++;
+    rb_ary_push(ins_array, llvm_instruction_wrap(i));
+  }
+  return ins_array;
+}
+
 VALUE 
 llvm_basic_block_builder(VALUE self) {
   BasicBlock* bb;
