@@ -2,3 +2,5 @@ Makefile
 llvmruby.so
 mkmf.log
 *.o
+*.bundle
+*.dSYM
