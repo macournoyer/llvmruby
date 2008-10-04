@@ -254,4 +254,9 @@ class BasicTests < Test::Unit::TestCase
       b.return(v)
     end
   end
+  
+  def test_pass_manager_run
+    m = LLVM::Module.new('test')
+    assert PassManager.new.run(m)
+  end
 end

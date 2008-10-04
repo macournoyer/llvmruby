@@ -11,7 +11,7 @@ OBJ = "llvmruby." + Config::CONFIG["DLEXT"]
 file "Makefile" do
   ruby "extconf.rb --with-llvm-include=`llvm-config --includedir` --with-llvm-lib=`llvm-config --libdir`"
 end
-file OBJ => "Makefile" do
+file OBJ => %w(Makefile) + FileList["*.{cpp,c,h}"] do
   sh "make"
 end
 desc "Compile llvmruby extensions"

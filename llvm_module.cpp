@@ -65,24 +65,25 @@ VALUE
 llvm_pass_manager_initialize(VALUE self) {
   PassManager *pm = new PassManager;
   DATA_PTR(self) = pm;
-/*
-  p.add(new TargetData(data->M));
-  p.add(createVerifierPass());
-  p.add(createLowerSetJmpPass());
-  p.add(createRaiseAllocationsPass());
-  p.add(createCFGSimplificationPass());
-  p.add(createPromoteMemoryToRegisterPass());
-  p.add(createGlobalOptimizerPass());
-  p.add(createGlobalDCEPass());
-  p.add(createFunctionInliningPass());
-  p.run(*data->M);
-*/
   return self;
 }
 
 VALUE
 llvm_pass_manager_run(VALUE self, VALUE module) {
-  ((PassManager*)DATA_PTR(self))->run(*LLVM_MODULE(module));
+  PassManager *pm = (PassManager*) DATA_PTR(self);
+  Module *m = LLVM_MODULE(module);
+  
+  pm->add(new TargetData(m));
+  pm->add(createVerifierPass());
+  pm->add(createLowerSetJmpPass());
+  pm->add(createRaiseAllocationsPass());
+  pm->add(createCFGSimplificationPass());
+  pm->add(createPromoteMemoryToRegisterPass());
+  pm->add(createGlobalOptimizerPass());
+  pm->add(createGlobalDCEPass());
+  pm->add(createFunctionInliningPass());
+  
+  pm->run(*m);
   return Qtrue;
 }
 
