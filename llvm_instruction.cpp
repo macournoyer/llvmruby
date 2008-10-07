@@ -1,9 +1,32 @@
 #include "llvmruby.h"
+#include <sstream>
 
 extern VALUE cLLVMInstruction;
 extern VALUE cLLVMBinaryOps;
 
 extern "C" {
+
+VALUE
+llvm_instruction_wrap(Instruction* i) {
+   return Data_Wrap_Struct(cLLVMInstruction, NULL, NULL, i);
+}
+
+VALUE
+llvm_instruction_inspect(VALUE self) {
+  Instruction *i = LLVM_INSTRUCTION(self);
+  std::ostringstream strstrm;
+  strstrm << *i;
+  return rb_str_new2(strstrm.str().c_str());
+}
+
+VALUE
+llvm_instruction_get_opcode_name(VALUE self) {
+  Instruction *i = LLVM_INSTRUCTION(self);
+  std::string name = i->getOpcodeName();
+  return rb_str_new2(name.c_str());
+}
+
+
 #define DEFINE_INST(type, name) rb_define_const(cLLVMInstruction, #name, INT2FIX(Instruction::name));
 #define DEFINE_BINARY_INST(name) DEFINE_INST(cLLVMBinaryOps, name)
 #define DEFINE_PRED(name) rb_define_const(cLLVMInstruction, #name, INT2FIX(ICmpInst::name));

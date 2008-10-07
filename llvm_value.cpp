@@ -6,6 +6,13 @@ llvm_value_wrap(Value* v) {
   return Data_Wrap_Struct(cLLVMValue, NULL, NULL, v); 
 }
 
+VALUE
+llvm_value_get_name(VALUE self) {
+  Value *v = LLVM_VAL(self);
+  std::string name = v->getName();
+  return rb_str_new2(name.c_str());
+}
+
 VALUE 
 llvm_value_get_constant(VALUE self, VALUE type, VALUE v) {
   return llvm_value_wrap(ConstantInt::get(LLVM_TYPE(type), FIX2INT(v)));

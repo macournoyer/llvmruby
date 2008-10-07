@@ -42,6 +42,7 @@ extern VALUE cLLVMPassManager;
 #define LLVM_MODULE(obj) ((Module*)DATA_PTR(obj))
 #define LLVM_FUNCTION(obj) ((Function*)DATA_PTR(obj))
 #define LLVM_BASIC_BLOCK(obj) ((BasicBlock*)DATA_PTR(obj))
+#define LLVM_INSTRUCTION(obj) ((Instruction*)DATA_PTR(obj))
 #define LLVM_PHI(obj) ((PHINode*)DATA_PTR(obj))
 
 #define CHECK_TYPE(val, klass)\
@@ -54,4 +55,5 @@ VALUE llvm_value_wrap(Value*);
 VALUE llvm_function_wrap(Function*);
 VALUE llvm_basic_block_wrap(BasicBlock*);
 VALUE llvm_function_create_block(VALUE);
+VALUE llvm_instruction_wrap(Instruction*);
 }
