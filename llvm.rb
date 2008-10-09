@@ -46,6 +46,12 @@ module LLVM
       end
     end
 
+    Instruction.constants.grep(/^FCMP_/) do |pred|
+      define_method(pred.downcase) do |x, y|
+        fcmp(Instruction.const_get(pred), x, y)
+      end
+    end
+
     def write(&b)
       instance_eval(&b)
     end

@@ -30,6 +30,7 @@ llvm_instruction_get_opcode_name(VALUE self) {
 #define DEFINE_INST(type, name) rb_define_const(cLLVMInstruction, #name, INT2FIX(Instruction::name));
 #define DEFINE_BINARY_INST(name) DEFINE_INST(cLLVMBinaryOps, name)
 #define DEFINE_PRED(name) rb_define_const(cLLVMInstruction, #name, INT2FIX(ICmpInst::name));
+#define DEFINE_FPRED(name) rb_define_const(cLLVMInstruction, #name, INT2FIX(FCmpInst::name));
 void init_instructions() {
   // Standard binary operators
   DEFINE_BINARY_INST(Add)
@@ -61,5 +62,20 @@ void init_instructions() {
   DEFINE_PRED(ICMP_SGE) // signed greater or equal
   DEFINE_PRED(ICMP_SLT) // signed less than
   DEFINE_PRED(ICMP_SLE) // signed less or equal
+
+  DEFINE_FPRED(FCMP_OEQ)
+  DEFINE_FPRED(FCMP_OGT)
+  DEFINE_FPRED(FCMP_OGE)
+  DEFINE_FPRED(FCMP_OLT)
+  DEFINE_FPRED(FCMP_OLE)
+  DEFINE_FPRED(FCMP_ONE)
+  DEFINE_FPRED(FCMP_ORD)
+  DEFINE_FPRED(FCMP_UNO)
+  DEFINE_FPRED(FCMP_UEQ)
+  DEFINE_FPRED(FCMP_UGT)
+  DEFINE_FPRED(FCMP_UGE)
+  DEFINE_FPRED(FCMP_ULT)
+  DEFINE_FPRED(FCMP_ULE)
+  DEFINE_FPRED(FCMP_UNE)
 }
 }

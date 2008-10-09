@@ -66,6 +66,7 @@ VALUE llvm_builder_alloca(VALUE, VALUE, VALUE);
 VALUE llvm_builder_load(VALUE, VALUE);
 VALUE llvm_builder_store(VALUE, VALUE, VALUE);
 VALUE llvm_builder_icmp(VALUE, VALUE, VALUE, VALUE);
+VALUE llvm_builder_fcmp(VALUE, VALUE, VALUE, VALUE);
 VALUE llvm_builder_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_struct_gep(VALUE, VALUE, VALUE);
 VALUE llvm_builder_int_to_ptr(VALUE, VALUE, VALUE);
@@ -163,6 +164,7 @@ void Init_llvmruby() {
   rb_define_method(cLLVMBuilder, "load", llvm_builder_load, 1);
   rb_define_method(cLLVMBuilder, "store", llvm_builder_store, 2);
   rb_define_method(cLLVMBuilder, "icmp", llvm_builder_icmp, 3);
+  rb_define_method(cLLVMBuilder, "fcmp", llvm_builder_fcmp, 3);
 
   rb_define_method(cLLVMBuilder, "gep", llvm_builder_gep, 2);
   rb_define_method(cLLVMBuilder, "struct_gep", llvm_builder_struct_gep, 2);

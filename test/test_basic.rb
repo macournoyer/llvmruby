@@ -119,6 +119,30 @@ class BasicTests < Test::Unit::TestCase
     assert_equal(0, result)
   end
 
+  def test_fcmps
+    m = LLVM::Module.new('test_fcmps')
+    type = Type.function(MACHINE_WORD, [])
+    f = m.get_or_insert_function('ult', type)
+  
+    entry_block = f.create_block
+    exit_block_true = f.create_block
+    exit_block_false = f.create_block
+  
+    b = entry_block.builder
+    cmp = b.fcmp_ult(1.0.llvm, 2.0.llvm)
+    b.cond_br(cmp, exit_block_true, exit_block_false)
+
+    b = exit_block_true.builder
+    b.return(0.llvm)
+
+    b = exit_block_false.builder
+    b.return(1.llvm)
+
+    ExecutionEngine.get(m)
+    result = ExecutionEngine.run_autoconvert(f)
+    assert_equal(0, result)
+  end
+
   def test_function_calls
     m = LLVM::Module.new('test_module')
     type = Type::function(MACHINE_WORD, [])

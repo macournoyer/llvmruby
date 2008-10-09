@@ -170,6 +170,15 @@ llvm_builder_icmp(VALUE self, VALUE pred, VALUE lhs, VALUE rhs) {
 }
 
 VALUE
+llvm_builder_fcmp(VALUE self, VALUE pred, VALUE lhs, VALUE rhs) {
+  DATA_GET_BUILDER
+
+  CmpInst::Predicate p = (CmpInst::Predicate)FIX2INT(pred);
+  Value *v = builder->CreateFCmp(p, LLVM_VAL(lhs), LLVM_VAL(rhs));
+  return llvm_value_wrap(v);
+}
+
+VALUE
 llvm_builder_gep(VALUE self, VALUE rptr, VALUE ridx) {
   DATA_GET_BUILDER
 
