@@ -61,6 +61,7 @@ module LLVM
     define_cast(:trunc,      Instruction::Trunc)
     define_cast(:zext,       Instruction::ZExt)
     define_cast(:sext,       Instruction::SExt)
+    define_cast(:fp_to_si,   Instruction::FPToSI)
     define_cast(:fp_to_ui,   Instruction::FPToUI)
     define_cast(:ui_to_fp,   Instruction::UIToFP)
     define_cast(:si_to_fp,   Instruction::SIToFP)
