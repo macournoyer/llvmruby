@@ -278,6 +278,13 @@ class BasicTests < Test::Unit::TestCase
       b.return(v)
     end
   end
+
+  def test_cast
+    function_tester(5) do |f|
+      b = f.create_block.builder
+      b.return(b.cast(Instruction::FPToSI, 5.0.llvm, MACHINE_WORD))
+    end
+  end
   
   def test_pass_manager_run
     m = LLVM::Module.new('test')

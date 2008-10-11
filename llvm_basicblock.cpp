@@ -198,6 +198,21 @@ llvm_builder_struct_gep(VALUE self, VALUE rptr, VALUE ridx) {
 }
 
 VALUE
+llvm_builder_cast(VALUE self, VALUE rop, VALUE rv, VALUE rdest_ty) {
+   DATA_GET_BUILDER
+
+   Instruction::CastOps op = (Instruction::CastOps)FIX2INT(rop); 
+
+   Value *v;
+   Data_Get_Struct(rv, Value, v);
+
+   Type *dest_ty;
+   Data_Get_Struct(rdest_ty, Type, dest_ty);
+
+   return llvm_value_wrap(builder->CreateCast(op, v, dest_ty));
+}
+
+VALUE
 llvm_builder_int_to_ptr(VALUE self, VALUE ri, VALUE rtype) {
   DATA_GET_BUILDER
 
