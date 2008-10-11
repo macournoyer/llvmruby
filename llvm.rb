@@ -52,6 +52,24 @@ module LLVM
       end
     end
 
+    def self.define_cast(name, inst)
+      define_method(name) do |val, dest_type|
+        cast(inst, val, dest_type)
+      end
+    end
+
+    define_cast(:trunc,      Instruction::Trunc)
+    define_cast(:zext,       Instruction::ZExt)
+    define_cast(:sext,       Instruction::SExt)
+    define_cast(:fp_to_ui,   Instruction::FPToUI)
+    define_cast(:ui_to_fp,   Instruction::UIToFP)
+    define_cast(:si_to_fp,   Instruction::SIToFP)
+    define_cast(:fp_trunc,   Instruction::FPTrunc)
+    define_cast(:fp_ext,     Instruction::FPExt)
+    define_cast(:ptr_to_int, Instruction::PtrToInt)
+    define_cast(:int_to_ptr, Instruction::IntToPtr)
+    define_cast(:bit_cast,   Instruction::BitCast)
+ 
     def write(&b)
       instance_eval(&b)
     end

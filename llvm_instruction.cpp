@@ -31,6 +31,8 @@ llvm_instruction_get_opcode_name(VALUE self) {
 #define DEFINE_BINARY_INST(name) DEFINE_INST(cLLVMBinaryOps, name)
 #define DEFINE_PRED(name) rb_define_const(cLLVMInstruction, #name, INT2FIX(ICmpInst::name));
 #define DEFINE_FPRED(name) rb_define_const(cLLVMInstruction, #name, INT2FIX(FCmpInst::name));
+#define DEFINE_CAST(name) rb_define_const(cLLVMInstruction, #name, INT2FIX(Instruction::name));
+
 void init_instructions() {
   // Standard binary operators
   DEFINE_BINARY_INST(Add)
@@ -77,5 +79,18 @@ void init_instructions() {
   DEFINE_FPRED(FCMP_ULT)
   DEFINE_FPRED(FCMP_ULE)
   DEFINE_FPRED(FCMP_UNE)
+
+  DEFINE_CAST(Trunc)
+  DEFINE_CAST(ZExt)
+  DEFINE_CAST(SExt)
+  DEFINE_CAST(FPToUI)
+  DEFINE_CAST(FPToSI)
+  DEFINE_CAST(UIToFP)
+  DEFINE_CAST(SIToFP)
+  DEFINE_CAST(FPTrunc)
+  DEFINE_CAST(FPExt)
+  DEFINE_CAST(PtrToInt)
+  DEFINE_CAST(IntToPtr)
+  DEFINE_CAST(BitCast)
 }
 }
