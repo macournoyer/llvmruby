@@ -32,6 +32,7 @@ extern VALUE cLLVMArrayType;
 extern VALUE cLLVMVectorType;
 extern VALUE cLLVMFunctionType;
 extern VALUE cLLVMInstruction;
+extern VALUE cLLVMSwitchInst;
 extern VALUE cLLVMBinaryOps;
 extern VALUE cLLVMPhi;
 extern VALUE cLLVMPassManager;

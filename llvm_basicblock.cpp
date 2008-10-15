@@ -110,6 +110,20 @@ llvm_builder_cond_br(VALUE self, VALUE rcond, VALUE rtrue_block, VALUE rfalse_bl
 }
 
 VALUE
+llvm_builder_switch(VALUE self, VALUE rv, VALUE rdefault) {
+  DATA_GET_BUILDER
+
+  BasicBlock *deflt;
+  Data_Get_Struct(rdefault, BasicBlock, deflt);
+
+  Value *v;
+  Data_Get_Struct(rv, Value, v);
+
+  Value* switch_instr = builder->CreateSwitch(v, deflt);
+  return Data_Wrap_Struct(cLLVMSwitchInst, NULL, NULL, switch_instr);
+}
+
+VALUE
 llvm_builder_malloc(VALUE self, VALUE rtype, VALUE rsize) {
   DATA_GET_BUILDER
 

@@ -26,6 +26,35 @@ llvm_instruction_get_opcode_name(VALUE self) {
   return rb_str_new2(name.c_str());
 }
 
+#define DATA_GET_SWITCH_INST SwitchInst *si; Data_Get_Struct(self, SwitchInst, si);
+
+VALUE
+llvm_switch_inst_get_default_dest(VALUE self) {
+  DATA_GET_SWITCH_INST
+  BasicBlock *bb = si->getDefaultDest();
+  return llvm_basic_block_wrap(bb); 
+}
+
+VALUE
+llvm_switch_inst_get_num_cases(VALUE self) {
+  DATA_GET_SWITCH_INST
+  return INT2FIX(si->getNumCases());
+}
+
+VALUE
+llvm_switch_inst_add_case(VALUE self, VALUE rci, VALUE rbb) {
+  DATA_GET_SWITCH_INST
+  
+  ConstantInt *ci;
+  Data_Get_Struct(rci, ConstantInt, ci);
+
+  BasicBlock *bb;
+  Data_Get_Struct(rbb, BasicBlock, bb);
+
+  si->addCase(ci, bb);
+  return self;
+}
+
 
 #define DEFINE_INST(type, name) rb_define_const(cLLVMInstruction, #name, INT2FIX(Instruction::name));
 #define DEFINE_BINARY_INST(name) DEFINE_INST(cLLVMBinaryOps, name)

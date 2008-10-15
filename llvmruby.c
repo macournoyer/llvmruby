@@ -13,6 +13,7 @@ VALUE cLLVMArrayType = Qnil;
 VALUE cLLVMVectorType = Qnil;
 VALUE cLLVMFunctionType = Qnil;
 VALUE cLLVMInstruction = Qnil;
+VALUE cLLVMSwitchInst = Qnil;
 VALUE cLLVMPhi = Qnil;
 VALUE cLLVMBinaryOps = Qnil;
 VALUE cLLVMPassManager = Qnil;
@@ -52,6 +53,9 @@ VALUE llvm_basic_block_get_instruction_list(VALUE);
 VALUE llvm_instruction_inspect(VALUE);
 VALUE llvm_instruction_get_opcode_name(VALUE);
 
+VALUE llvm_switch_inst_get_default_dest(VALUE);
+VALUE llvm_switch_inst_get_num_cases(VALUE);
+VALUE llvm_switch_inst_add_case(VALUE, VALUE, VALUE);
 
 VALUE llvm_builder_set_insert_point(VALUE, VALUE);
 VALUE llvm_builder_bin_op(VALUE, VALUE, VALUE, VALUE);
@@ -59,6 +63,7 @@ VALUE llvm_builder_phi(VALUE, VALUE);
 VALUE llvm_builder_return(VALUE, VALUE);
 VALUE llvm_builder_br(VALUE, VALUE);
 VALUE llvm_builder_cond_br(VALUE, VALUE, VALUE, VALUE);
+VALUE llvm_builder_switch(VALUE, VALUE, VALUE);
 
 VALUE llvm_builder_malloc(VALUE, VALUE, VALUE);
 VALUE llvm_builder_free(VALUE, VALUE);
@@ -109,6 +114,7 @@ void Init_llvmruby() {
   cLLVMBuilder = rb_define_class_under(cLLVMRuby, "Builder", rb_cObject);
 
   cLLVMInstruction = rb_define_class_under(cLLVMRuby, "Instruction", rb_cObject);
+  cLLVMSwitchInst = rb_define_class_under(cLLVMRuby, "SwitchInst", cLLVMInstruction);
   cLLVMBinaryOps = rb_define_class_under(cLLVMInstruction, "BinaryOps", rb_cObject);
   cLLVMPhi = rb_define_class_under(cLLVMRuby, "Phi", cLLVMValue);
 
@@ -153,12 +159,17 @@ void Init_llvmruby() {
   rb_define_method(cLLVMInstruction, "inspect", llvm_instruction_inspect, 0);
   rb_define_method(cLLVMInstruction, "get_opcode_name", llvm_instruction_get_opcode_name, 0);
 
+  rb_define_method(cLLVMSwitchInst, "get_default_dest", llvm_switch_inst_get_default_dest, 0);
+  rb_define_method(cLLVMSwitchInst, "get_num_cases", llvm_switch_inst_get_num_cases, 0);
+  rb_define_method(cLLVMSwitchInst, "add_case", llvm_switch_inst_add_case, 2);
+
   rb_define_method(cLLVMBuilder, "set_insert_point", llvm_builder_set_insert_point, 1);
   rb_define_method(cLLVMBuilder, "bin_op", llvm_builder_bin_op, 3);
   rb_define_method(cLLVMBuilder, "phi", llvm_builder_phi, 1);
   rb_define_method(cLLVMBuilder, "return", llvm_builder_return, 1);
   rb_define_method(cLLVMBuilder, "br", llvm_builder_br, 1);
   rb_define_method(cLLVMBuilder, "cond_br", llvm_builder_cond_br, 3);
+  rb_define_method(cLLVMBuilder, "switch", llvm_builder_switch, 2);
   rb_define_method(cLLVMBuilder, "malloc", llvm_builder_malloc, 2);
   rb_define_method(cLLVMBuilder, "free", llvm_builder_free, 1);
   rb_define_method(cLLVMBuilder, "alloca", llvm_builder_alloca, 2);

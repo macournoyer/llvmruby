@@ -285,6 +285,24 @@ class BasicTests < Test::Unit::TestCase
       b.return(b.cast(Instruction::FPToSI, 5.0.llvm, MACHINE_WORD))
     end
   end
+
+  def test_switch
+    function_tester(23) do |f|
+      b = f.create_block.builder
+      default = f.create_block
+      on5 = f.create_block
+      switch = b.switch(5.llvm, default)
+      switch.add_case(5.llvm, on5)
+      assert_instance_of(SwitchInst, switch)
+      assert_equal(2, switch.get_num_cases);
+      
+      b = default.builder
+      b.return(7.llvm(MACHINE_WORD))
+
+      b = on5.builder
+      b.return(23.llvm)
+    end
+  end
   
   def test_pass_manager_run
     m = LLVM::Module.new('test')
