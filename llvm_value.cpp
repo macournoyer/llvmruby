@@ -23,6 +23,11 @@ llvm_value_get_float_constant(VALUE self, VALUE v) {
   return llvm_value_wrap(ConstantFP::get(Type::FloatTy, RFLOAT(v)->value));
 }
 
+VALUE 
+llvm_value_get_double_constant(VALUE self, VALUE v) {
+  return llvm_value_wrap(ConstantFP::get(Type::DoubleTy, RFLOAT(v)->value));
+}
+
 VALUE
 llvm_value_get_struct_constant(int argc, VALUE *argv, VALUE self) {
   StructType *t = (StructType*)DATA_PTR(argv[0]);
