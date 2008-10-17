@@ -85,7 +85,7 @@ VALUE
 llvm_type_vector(VALUE self, VALUE rtype, VALUE size) {
   Type *type;
   Data_Get_Struct(rtype, Type, type);
-  type = ArrayType::get(type, FIX2INT(size));
+  type = VectorType::get(type, FIX2INT(size));
   return Data_Wrap_Struct(cLLVMVectorType, NULL, NULL, type);
 }
 

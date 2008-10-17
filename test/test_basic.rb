@@ -303,7 +303,19 @@ class BasicTests < Test::Unit::TestCase
       b.return(23.llvm)
     end
   end
-  
+
+  def test_vector
+    function_tester(666) do |f|
+      b = f.create_block.builder
+      vt = Type.vector(MACHINE_WORD, 3) 
+      vp = b.alloca(vt, 0)
+      v = b.load(vp) 
+      v2 = b.insert_element(v, 666.llvm(MACHINE_WORD), 0.llvm(Type::Int32Ty))
+      r = b.extract_element(v2, 0.llvm(Type::Int32Ty))
+      b.return(r)
+    end
+  end
+
   def test_pass_manager_run
     m = LLVM::Module.new('test')
     assert PassManager.new.run(m)

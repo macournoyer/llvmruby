@@ -259,6 +259,29 @@ llvm_builder_call(int argc, VALUE* argv, VALUE self) {
 }
 
 VALUE
+llvm_builder_insert_element(VALUE self, VALUE rv, VALUE rnv, VALUE ridx) {
+  DATA_GET_BUILDER
+
+  Value *v, *nv, *idx;
+  Data_Get_Struct(rv, Value, v); 
+  Data_Get_Struct(rnv, Value, nv);
+  Data_Get_Struct(ridx, Value, idx);
+
+  return llvm_value_wrap(builder->CreateInsertElement(v, nv, idx));
+}
+
+VALUE
+llvm_builder_extract_element(VALUE self, VALUE rv, VALUE ridx) {
+  DATA_GET_BUILDER
+
+  Value *v, *idx;
+  Data_Get_Struct(rv, Value, v);
+  Data_Get_Struct(ridx, Value, idx);
+
+  return llvm_value_wrap(builder->CreateExtractElement(v, idx));
+}
+
+VALUE
 llvm_builder_get_global(VALUE self) {
   GlobalVariable *g = new GlobalVariable(Type::Int64Ty, false, GlobalValue::ExternalLinkage, 0, "shakalaka");
   return llvm_value_wrap(g);
