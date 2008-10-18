@@ -4,3 +4,4 @@ mkmf.log
 *.o
 *.bundle
 *.dSYM
+*.gem

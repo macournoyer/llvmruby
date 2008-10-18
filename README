@@ -19,21 +19,21 @@ Make sure that you configure LLVM with PIC enabled:
 
 Add the llvm bin directory to your path, extconf needs to be able to find llvm-conf:
 
-  $ export PATH=$PATH:/$LLVMDIR/Debug/bin
+  $ export PATH=$PATH:/$LLVMDIR/Release/bin
 
-Once you have built LLVM, run extconf.rb giving it location of LLVM:
+Run rake
 
-  $ ruby extconf.rb --with-llvm-include=/$DIR/llvm/include --with-llvm-lib=/$DIR/llvm/Debug/lib
-
-Run make
-
-  $ make
+  $ rake
 
 Run the tests (you will need Rake installed)
 
   $ rake test
 
-Look in test.rb to see examples of use and start messing around.
+Look in test.rb to see examples of use and start messing around.  The
+project was recently reorganized in gem format with Ruby files in lib,
+and C/CPP and extension in ext.  You will need to either load the 
+library as a gem or make sure that both lib and ext dirs are in your
+load path.
 
 * Caveats
 
