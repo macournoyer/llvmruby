@@ -1,6 +1,3 @@
-$:.unshift "#{File.dirname(__FILE__)}/../lib"
-$:.unshift "#{File.dirname(__FILE__)}/../ext"
-
 require 'test/unit'
 require 'llvm'
 require 'ruby_vm'

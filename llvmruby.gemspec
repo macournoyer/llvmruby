@@ -8,7 +8,7 @@ spec = Gem::Specification.new do |s|
     s.authors       = [ "Thomas Bagby" ]
     s.email         = [ "tomatobagby@gmail.com" ]
     s.files         = Dir.glob("{doc,ext,lib,test}/**/*")
-    s.require_path  =   "lib"
+    s.require_path  = "lib"
 
     s.extensions    << 'ext/extconf.rb'
 
