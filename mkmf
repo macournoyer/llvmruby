@@ -1,1 +1,0 @@
-ruby extconf.rb --with-llvm-include=/home/tom/llvm/include --with-llvm-lib=/home/tom/llvm/Debug/lib
