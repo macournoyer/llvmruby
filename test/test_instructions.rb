@@ -43,4 +43,41 @@ class InstructionTests < Test::Unit::TestCase
     assert(expected_opcodes_in_bswap, actual_opcodes_in_bswap)
   end
 
+  def test_branch_instructions
+    m = LLVM::Module.new('branch_instructions')
+    ExecutionEngine.get(m)
+    type = Type::function(MACHINE_WORD, [])
+
+    f = m.get_or_insert_function("test_br", type)
+    b1 = f.create_block
+    b2 = f.create_block
+    b3 = f.create_block
+    b4 = f.create_block
+
+    b = b1.builder
+    br_inst = b.br(b2)
+
+    b = b2.builder
+    cmp1 = b.icmp_sgt(-1.llvm, 1.llvm)
+    cmp2 = b.icmp_slt(-1.llvm, 1.llvm)
+    cond_br_inst = b.cond_br(cmp1, b3, b4)
+
+    b = b3.builder
+    b.return(23.llvm)
+
+    b = b4.builder
+    b.return(5.llvm)
+
+    assert_kind_of(BranchInst, br_inst)
+    assert(br_inst.unconditional?)
+    assert(!br_inst.conditional?)
+
+    assert_kind_of(BranchInst, cond_br_inst)
+    assert(cond_br_inst.conditional?)
+    assert(!cond_br_inst.unconditional?)
+    assert_kind_of(Value, cond_br_inst.condition)
+    cond_br_inst.condition = cmp2
+
+    assert_equal(23, ExecutionEngine.run_autoconvert(f))
+  end
 end

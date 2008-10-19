@@ -92,7 +92,9 @@ llvm_builder_br(VALUE self, VALUE rblock) {
 
   BasicBlock *bb;
   Data_Get_Struct(rblock, BasicBlock, bb);
-  return llvm_value_wrap(builder->CreateBr(bb)); 
+
+  Value *branch_instr = builder->CreateBr(bb);
+  return Data_Wrap_Struct(cLLVMBranchInst, NULL, NULL, branch_instr); 
 }  
 
 VALUE 
@@ -106,7 +108,8 @@ llvm_builder_cond_br(VALUE self, VALUE rcond, VALUE rtrue_block, VALUE rfalse_bl
   Data_Get_Struct(rtrue_block, BasicBlock, true_block);
   Data_Get_Struct(rfalse_block, BasicBlock, false_block);
 
-  return llvm_value_wrap(builder->CreateCondBr(cond, true_block, false_block));
+  Value *branch_instr = builder->CreateCondBr(cond, true_block, false_block);
+  return Data_Wrap_Struct(cLLVMBranchInst, NULL, NULL, branch_instr);
 }
 
 VALUE

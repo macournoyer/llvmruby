@@ -13,6 +13,7 @@ VALUE cLLVMArrayType = Qnil;
 VALUE cLLVMVectorType = Qnil;
 VALUE cLLVMFunctionType = Qnil;
 VALUE cLLVMInstruction = Qnil;
+VALUE cLLVMBranchInst = Qnil;
 VALUE cLLVMSwitchInst = Qnil;
 VALUE cLLVMPhi = Qnil;
 VALUE cLLVMBinaryOps = Qnil;
@@ -52,6 +53,11 @@ VALUE llvm_basic_block_get_instruction_list(VALUE);
 
 VALUE llvm_instruction_inspect(VALUE);
 VALUE llvm_instruction_get_opcode_name(VALUE);
+
+VALUE llvm_branch_inst_is_conditional(VALUE);
+VALUE llvm_branch_inst_is_unconditional(VALUE);
+VALUE llvm_branch_inst_get_condition(VALUE);
+VALUE llvm_branch_inst_set_condition(VALUE, VALUE);
 
 VALUE llvm_switch_inst_get_default_dest(VALUE);
 VALUE llvm_switch_inst_get_num_cases(VALUE);
@@ -117,6 +123,7 @@ void Init_llvmruby() {
   cLLVMBuilder = rb_define_class_under(cLLVMRuby, "Builder", rb_cObject);
 
   cLLVMInstruction = rb_define_class_under(cLLVMRuby, "Instruction", rb_cObject);
+  cLLVMBranchInst = rb_define_class_under(cLLVMRuby, "BranchInst", cLLVMInstruction);
   cLLVMSwitchInst = rb_define_class_under(cLLVMRuby, "SwitchInst", cLLVMInstruction);
   cLLVMBinaryOps = rb_define_class_under(cLLVMInstruction, "BinaryOps", rb_cObject);
   cLLVMPhi = rb_define_class_under(cLLVMRuby, "Phi", cLLVMValue);
@@ -162,6 +169,11 @@ void Init_llvmruby() {
 
   rb_define_method(cLLVMInstruction, "inspect", llvm_instruction_inspect, 0);
   rb_define_method(cLLVMInstruction, "get_opcode_name", llvm_instruction_get_opcode_name, 0);
+
+  rb_define_method(cLLVMBranchInst, "conditional?", llvm_branch_inst_is_conditional, 0);
+  rb_define_method(cLLVMBranchInst, "unconditional?", llvm_branch_inst_is_unconditional, 0);
+  rb_define_method(cLLVMBranchInst, "condition", llvm_branch_inst_get_condition, 0);
+  rb_define_method(cLLVMBranchInst, "condition=", llvm_branch_inst_set_condition, 1);
 
   rb_define_method(cLLVMSwitchInst, "get_default_dest", llvm_switch_inst_get_default_dest, 0);
   rb_define_method(cLLVMSwitchInst, "get_num_cases", llvm_switch_inst_get_num_cases, 0);

@@ -26,6 +26,37 @@ llvm_instruction_get_opcode_name(VALUE self) {
   return rb_str_new2(name.c_str());
 }
 
+#define DATA_GET_BRANCH_INST BranchInst *bi; Data_Get_Struct(self, BranchInst, bi);
+
+VALUE
+llvm_branch_inst_is_unconditional(VALUE self) {
+  DATA_GET_BRANCH_INST
+  return bi->isUnconditional() ? Qtrue : Qfalse;
+}
+
+VALUE
+llvm_branch_inst_is_conditional(VALUE self) {
+  DATA_GET_BRANCH_INST
+  return bi->isConditional() ? Qtrue : Qfalse;
+}
+
+VALUE
+llvm_branch_inst_get_condition(VALUE self) {
+  DATA_GET_BRANCH_INST
+  return llvm_value_wrap(bi->getCondition()); 
+}
+
+VALUE
+llvm_branch_inst_set_condition(VALUE self, VALUE rv) {
+  DATA_GET_BRANCH_INST
+  
+  Value *v;
+  Data_Get_Struct(rv, Value, v);
+
+  bi->setCondition(v);
+  return rv;
+}
+
 #define DATA_GET_SWITCH_INST SwitchInst *si; Data_Get_Struct(self, SwitchInst, si);
 
 VALUE
