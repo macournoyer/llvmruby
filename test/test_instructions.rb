@@ -53,6 +53,7 @@ class InstructionTests < Test::Unit::TestCase
     b2 = f.create_block
     b3 = f.create_block
     b4 = f.create_block
+    b5 = f.create_block
 
     b = b1.builder
     br_inst = b.br(b2)
@@ -68,16 +69,27 @@ class InstructionTests < Test::Unit::TestCase
     b = b4.builder
     b.return(5.llvm)
 
+    b = b5.builder
+    ret_inst = b.return(1999.llvm)
+
     assert_kind_of(BranchInst, br_inst)
     assert(br_inst.unconditional?)
     assert(!br_inst.conditional?)
+    assert_equal(1, br_inst.num_successors)
+    assert_kind_of(BasicBlock, br_inst.get_successor(0))
 
     assert_kind_of(BranchInst, cond_br_inst)
     assert(cond_br_inst.conditional?)
     assert(!cond_br_inst.unconditional?)
     assert_kind_of(Value, cond_br_inst.condition)
-    cond_br_inst.condition = cmp2
+    assert_equal(2, cond_br_inst.num_successors)
+    assert_kind_of(BasicBlock, cond_br_inst.get_successor(1))
 
-    assert_equal(23, ExecutionEngine.run_autoconvert(f))
+    assert_kind_of(ReturnInst, ret_inst)
+    assert_equal(0, ret_inst.num_successors)
+
+    cond_br_inst.condition = cmp2
+    cond_br_inst.set_successor(0, b5)
+    assert_equal(1999, ExecutionEngine.run_autoconvert(f))
   end
 end

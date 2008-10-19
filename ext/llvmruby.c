@@ -13,6 +13,8 @@ VALUE cLLVMArrayType = Qnil;
 VALUE cLLVMVectorType = Qnil;
 VALUE cLLVMFunctionType = Qnil;
 VALUE cLLVMInstruction = Qnil;
+VALUE cLLVMTerminatorInst = Qnil;
+VALUE cLLVMReturnInst = Qnil;
 VALUE cLLVMBranchInst = Qnil;
 VALUE cLLVMSwitchInst = Qnil;
 VALUE cLLVMPhi = Qnil;
@@ -53,6 +55,10 @@ VALUE llvm_basic_block_get_instruction_list(VALUE);
 
 VALUE llvm_instruction_inspect(VALUE);
 VALUE llvm_instruction_get_opcode_name(VALUE);
+
+VALUE llvm_terminator_inst_num_successors(VALUE);
+VALUE llvm_terminator_inst_get_successor(VALUE, VALUE);
+VALUE llvm_terminator_inst_set_successor(VALUE, VALUE, VALUE);
 
 VALUE llvm_branch_inst_is_conditional(VALUE);
 VALUE llvm_branch_inst_is_unconditional(VALUE);
@@ -123,8 +129,10 @@ void Init_llvmruby() {
   cLLVMBuilder = rb_define_class_under(cLLVMRuby, "Builder", rb_cObject);
 
   cLLVMInstruction = rb_define_class_under(cLLVMRuby, "Instruction", rb_cObject);
-  cLLVMBranchInst = rb_define_class_under(cLLVMRuby, "BranchInst", cLLVMInstruction);
-  cLLVMSwitchInst = rb_define_class_under(cLLVMRuby, "SwitchInst", cLLVMInstruction);
+  cLLVMTerminatorInst = rb_define_class_under(cLLVMRuby, "TerminatorInst", cLLVMInstruction);
+  cLLVMReturnInst = rb_define_class_under(cLLVMRuby, "ReturnInst", cLLVMTerminatorInst);
+  cLLVMBranchInst = rb_define_class_under(cLLVMRuby, "BranchInst", cLLVMTerminatorInst);
+  cLLVMSwitchInst = rb_define_class_under(cLLVMRuby, "SwitchInst", cLLVMTerminatorInst);
   cLLVMBinaryOps = rb_define_class_under(cLLVMInstruction, "BinaryOps", rb_cObject);
   cLLVMPhi = rb_define_class_under(cLLVMRuby, "Phi", cLLVMValue);
 
@@ -169,6 +177,10 @@ void Init_llvmruby() {
 
   rb_define_method(cLLVMInstruction, "inspect", llvm_instruction_inspect, 0);
   rb_define_method(cLLVMInstruction, "get_opcode_name", llvm_instruction_get_opcode_name, 0);
+
+  rb_define_method(cLLVMTerminatorInst, "num_successors", llvm_terminator_inst_num_successors, 0);
+  rb_define_method(cLLVMTerminatorInst, "get_successor", llvm_terminator_inst_get_successor, 1);
+  rb_define_method(cLLVMTerminatorInst, "set_successor", llvm_terminator_inst_set_successor, 2);
 
   rb_define_method(cLLVMBranchInst, "conditional?", llvm_branch_inst_is_conditional, 0);
   rb_define_method(cLLVMBranchInst, "unconditional?", llvm_branch_inst_is_unconditional, 0);

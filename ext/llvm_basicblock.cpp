@@ -83,7 +83,7 @@ VALUE
 llvm_builder_return(VALUE self, VALUE rv) {
   //CHECK_TYPE(rv, cLLVMValue);
   DATA_GET_BUILDER
-  return llvm_value_wrap(builder->CreateRet(LLVM_VAL(rv)));
+  return Data_Wrap_Struct(cLLVMReturnInst, NULL, NULL, builder->CreateRet(LLVM_VAL(rv)));
 }
 
 VALUE 

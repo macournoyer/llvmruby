@@ -26,6 +26,32 @@ llvm_instruction_get_opcode_name(VALUE self) {
   return rb_str_new2(name.c_str());
 }
 
+#define DATA_GET_TERMINATOR_INST TerminatorInst *ti; Data_Get_Struct(self, TerminatorInst, ti);
+
+VALUE
+llvm_terminator_inst_num_successors(VALUE self) {
+  DATA_GET_TERMINATOR_INST
+  return INT2FIX(ti->getNumSuccessors());
+}
+
+VALUE
+llvm_terminator_inst_get_successor(VALUE self, VALUE ridx) {
+  DATA_GET_TERMINATOR_INST
+  BasicBlock *bb = ti->getSuccessor(FIX2INT(ridx));
+  return llvm_basic_block_wrap(bb);
+}
+
+VALUE
+llvm_terminator_inst_set_successor(VALUE self, VALUE ridx, VALUE rbb) {
+  DATA_GET_TERMINATOR_INST
+ 
+  BasicBlock *bb;
+  Data_Get_Struct(rbb, BasicBlock, bb);
+
+  ti->setSuccessor(FIX2INT(ridx), bb);
+  return rbb;
+}
+
 #define DATA_GET_BRANCH_INST BranchInst *bi; Data_Get_Struct(self, BranchInst, bi);
 
 VALUE
