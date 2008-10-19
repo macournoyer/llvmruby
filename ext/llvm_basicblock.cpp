@@ -135,7 +135,7 @@ llvm_builder_malloc(VALUE self, VALUE rtype, VALUE rsize) {
 
   Value *size = ConstantInt::get(Type::Int32Ty, FIX2INT(rsize));
   Value *v = builder->CreateMalloc(type, size);
-  return llvm_value_wrap(v);
+  return Data_Wrap_Struct(cLLVMAllocationInst, NULL, NULL, v);
 }
 
 VALUE
@@ -155,7 +155,7 @@ llvm_builder_alloca(VALUE self, VALUE rtype, VALUE rsize) {
 
   Value *size = ConstantInt::get(Type::Int32Ty, FIX2INT(rsize));
   Value *v = builder->CreateAlloca(type, size);
-  return llvm_value_wrap(v);
+  return Data_Wrap_Struct(cLLVMAllocationInst, NULL, NULL, v);
 }
 
 VALUE

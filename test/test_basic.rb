@@ -272,6 +272,12 @@ class BasicTests < Test::Unit::TestCase
     function_tester(23) do |f|
       b = f.create_block.builder
       new_space = b.malloc(MACHINE_WORD, 1)
+      assert_kind_of(AllocationInst, new_space)
+      assert(!new_space.array_allocation?)
+      assert_kind_of(Value, new_space.array_size)
+      assert_kind_of(Type, new_space.allocated_type)
+      assert_equal(0, new_space.alignment)
+
       b.store(23.llvm(MACHINE_WORD), new_space)    
       v = b.load(new_space)
       b.free(new_space)

@@ -112,6 +112,32 @@ llvm_switch_inst_add_case(VALUE self, VALUE rci, VALUE rbb) {
   return self;
 }
 
+#define DATA_GET_ALLOCATION_INST AllocationInst *ai; Data_Get_Struct(self, AllocationInst, ai);
+
+VALUE 
+llvm_allocation_inst_is_array_allocation(VALUE self) {
+  DATA_GET_ALLOCATION_INST
+  return ai->isArrayAllocation() ? true : false;
+}
+
+VALUE 
+llvm_allocation_inst_array_size(VALUE self) {
+  DATA_GET_ALLOCATION_INST
+  return llvm_value_wrap(ai->getArraySize());
+}
+
+VALUE 
+llvm_allocation_inst_allocated_type(VALUE self) {
+  DATA_GET_ALLOCATION_INST
+  Type *at = const_cast<Type*>(ai->getAllocatedType()); 
+  return Data_Wrap_Struct(cLLVMType, NULL, NULL, at);
+}
+
+VALUE 
+llvm_allocation_inst_alignment(VALUE self) {
+  DATA_GET_ALLOCATION_INST
+  return INT2FIX(ai->getAlignment());
+}
 
 #define DEFINE_INST(type, name) rb_define_const(cLLVMInstruction, #name, INT2FIX(Instruction::name));
 #define DEFINE_BINARY_INST(name) DEFINE_INST(cLLVMBinaryOps, name)

@@ -17,6 +17,7 @@ VALUE cLLVMTerminatorInst = Qnil;
 VALUE cLLVMReturnInst = Qnil;
 VALUE cLLVMBranchInst = Qnil;
 VALUE cLLVMSwitchInst = Qnil;
+VALUE cLLVMAllocationInst = Qnil;
 VALUE cLLVMPhi = Qnil;
 VALUE cLLVMBinaryOps = Qnil;
 VALUE cLLVMPassManager = Qnil;
@@ -68,6 +69,11 @@ VALUE llvm_branch_inst_set_condition(VALUE, VALUE);
 VALUE llvm_switch_inst_get_default_dest(VALUE);
 VALUE llvm_switch_inst_get_num_cases(VALUE);
 VALUE llvm_switch_inst_add_case(VALUE, VALUE, VALUE);
+
+VALUE llvm_allocation_inst_is_array_allocation(VALUE);
+VALUE llvm_allocation_inst_array_size(VALUE);
+VALUE llvm_allocation_inst_allocated_type(VALUE);
+VALUE llvm_allocation_inst_alignment(VALUE);
 
 VALUE llvm_builder_set_insert_point(VALUE, VALUE);
 VALUE llvm_builder_bin_op(VALUE, VALUE, VALUE, VALUE);
@@ -133,6 +139,7 @@ void Init_llvmruby() {
   cLLVMReturnInst = rb_define_class_under(cLLVMRuby, "ReturnInst", cLLVMTerminatorInst);
   cLLVMBranchInst = rb_define_class_under(cLLVMRuby, "BranchInst", cLLVMTerminatorInst);
   cLLVMSwitchInst = rb_define_class_under(cLLVMRuby, "SwitchInst", cLLVMTerminatorInst);
+  cLLVMAllocationInst = rb_define_class_under(cLLVMRuby, "AllocationInst", cLLVMInstruction);
   cLLVMBinaryOps = rb_define_class_under(cLLVMInstruction, "BinaryOps", rb_cObject);
   cLLVMPhi = rb_define_class_under(cLLVMRuby, "Phi", cLLVMValue);
 
@@ -190,6 +197,11 @@ void Init_llvmruby() {
   rb_define_method(cLLVMSwitchInst, "get_default_dest", llvm_switch_inst_get_default_dest, 0);
   rb_define_method(cLLVMSwitchInst, "get_num_cases", llvm_switch_inst_get_num_cases, 0);
   rb_define_method(cLLVMSwitchInst, "add_case", llvm_switch_inst_add_case, 2);
+
+  rb_define_method(cLLVMAllocationInst, "array_allocation?", llvm_allocation_inst_is_array_allocation, 0);
+  rb_define_method(cLLVMAllocationInst, "array_size", llvm_allocation_inst_array_size, 0);
+  rb_define_method(cLLVMAllocationInst, "allocated_type", llvm_allocation_inst_allocated_type, 0);
+  rb_define_method(cLLVMAllocationInst, "alignment", llvm_allocation_inst_alignment, 0);
 
   rb_define_method(cLLVMBuilder, "set_insert_point", llvm_builder_set_insert_point, 1);
   rb_define_method(cLLVMBuilder, "bin_op", llvm_builder_bin_op, 3);

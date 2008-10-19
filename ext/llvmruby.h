@@ -36,6 +36,7 @@ extern VALUE cLLVMTerminatorInst;
 extern VALUE cLLVMReturnInst;
 extern VALUE cLLVMBranchInst;
 extern VALUE cLLVMSwitchInst;
+extern VALUE cLLVMAllocationInst;
 extern VALUE cLLVMBinaryOps;
 extern VALUE cLLVMPhi;
 extern VALUE cLLVMPassManager;
