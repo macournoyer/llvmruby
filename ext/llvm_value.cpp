@@ -7,10 +7,52 @@ llvm_value_wrap(Value* v) {
 }
 
 VALUE
-llvm_value_get_name(VALUE self) {
-  Value *v = LLVM_VAL(self);
-  std::string name = v->getName();
-  return rb_str_new2(name.c_str());
+llvm_value_name(VALUE self) {
+  Value *v;
+  Data_Get_Struct(self, Value, v);
+
+  if(v->hasName()) {
+    const char *name = v->getNameStart();
+    int len = v->getNameLen();
+    return rb_str_new(name, len);
+  } else {
+    return Qnil;
+  }
+}
+
+VALUE
+llvm_value_set_name(VALUE self, VALUE rname) {
+  Value *v;
+  Data_Get_Struct(self, Value, v);
+  v->setName(RSTRING_PTR(rname), RSTRING_LEN(rname));
+  return rname; 
+}
+
+VALUE 
+llvm_value_num_uses(VALUE self) {
+  Value *v;
+  Data_Get_Struct(self, Value, v);
+  return INT2FIX(v->getNumUses());
+}
+
+VALUE 
+llvm_value_used_in_basic_block(VALUE self, VALUE rbb) {
+  Value *v;
+  Data_Get_Struct(self, Value, v);
+  
+  BasicBlock *bb;
+  Data_Get_Struct(rbb, BasicBlock, bb);
+
+  return v->isUsedInBasicBlock(bb) ? Qtrue : Qfalse;
+}
+
+VALUE 
+llvm_value_replace_all_uses_with(VALUE self, VALUE rv2) {
+  Value *v1, *v2;
+  Data_Get_Struct(self, Value, v1);
+  Data_Get_Struct(rv2, Value, v2);
+  v1->replaceAllUsesWith(v2);
+  return rv2;
 }
 
 VALUE 

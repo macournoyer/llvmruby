@@ -57,9 +57,24 @@ class BasicBlockTests < Test::Unit::TestCase
     expected = { 'entry' => 2, 'bb5' => 6, 'bb11' => 2, 'bb15.split' => 2, 'bb19' => 4, 'bb26' => 2 }
     res = Hash.new
     bbs.each { |b|
-      res[b.get_name] = b.size
+      res[b.name] = b.size
     }
     assert_equal(expected,res)
   end
 
+  def test_manipulate_values
+    m = LLVM::Module.read_assembly(@assembly_gcd)
+    gcd = m.get_function("gcd")
+
+    bbs = gcd.get_basic_block_list
+    bb = bbs.first
+    assert_equal('entry', bb.name)
+    bb.name = 'first_block'
+    assert_equal('first_block', bb.name)
+    assert_equal(3, bb.num_uses)
+    bb2 = bbs.find {|x| x.name == 'bb19'}
+    assert(bb.used_in_basic_block?(bb2))
+    bb3 = bbs.find {|x| x.name = 'bb26'}
+    assert(!bb.used_in_basic_block?(bb3))
+  end
 end

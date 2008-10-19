@@ -106,8 +106,11 @@ VALUE llvm_value_get_float_constant(VALUE);
 VALUE llvm_value_get_double_constant(VALUE);
 VALUE llvm_value_get_immediate_constant(VALUE);
 VALUE llvm_value_get_struct_constant(int, VALUE*, VALUE);
-VALUE llvm_value_get_name(VALUE);
-
+VALUE llvm_value_name(VALUE);
+VALUE llvm_value_set_name(VALUE, VALUE);
+VALUE llvm_value_num_uses(VALUE);
+VALUE llvm_value_used_in_basic_block(VALUE, VALUE);
+VALUE llvm_value_replace_all_uses_with(VALUE, VALUE);
 
 VALUE llvm_phi_add_incoming(VALUE, VALUE, VALUE);
 
@@ -158,7 +161,11 @@ void Init_llvmruby() {
   rb_define_module_function(cLLVMValue, "get_double_constant", llvm_value_get_double_constant, 1);
   rb_define_module_function(cLLVMValue, "get_immediate_constant", llvm_value_get_immediate_constant, 1);
   rb_define_module_function(cLLVMValue, "get_struct_constant", llvm_value_get_struct_constant, -1);
-  rb_define_method(cLLVMValue, "get_name", llvm_value_get_name, 0);
+  rb_define_method(cLLVMValue, "name", llvm_value_name, 0);
+  rb_define_method(cLLVMValue, "name=", llvm_value_set_name, 1);
+  rb_define_method(cLLVMValue, "num_uses", llvm_value_num_uses, 0);
+  rb_define_method(cLLVMValue, "used_in_basic_block?", llvm_value_used_in_basic_block, 1);
+  rb_define_method(cLLVMValue, "replace_all_uses_with", llvm_value_replace_all_uses_with, 1);
 
   init_instructions();
 
