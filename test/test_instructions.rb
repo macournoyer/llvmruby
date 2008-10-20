@@ -44,6 +44,15 @@ class InstructionTests < Test::Unit::TestCase
     
     assert_kind_of(BinaryOperator, ins.first)
     assert_kind_of(ReturnInst, ins.last)
+ 
+    f1, f2 = ins[0], ins[1]
+    assert(!f1.may_read_from_memory?)
+    assert(!f1.may_write_to_memory?)
+    assert(!f1.identical_to?(f2))
+    assert(f1.identical_to?(f1))
+    assert(f1.same_operation_as?(f2))
+    assert(f1.same_operation_as?(f1))
+    assert(!f1.used_outside_of_block?(b))
   end
 
   def test_instruction_classes

@@ -9,6 +9,8 @@ extern "C" {
 #define LAST_INSTRUCTION_NUM 100
 VALUE gInstructionClasses[LAST_INSTRUCTION_NUM];
 
+#define DATA_GET_INSTRUCTION Instruction *i; Data_Get_Struct(self, Instruction, i);
+
 VALUE
 llvm_instruction_wrap(Instruction* i) {
    return Data_Wrap_Struct(gInstructionClasses[i->getOpcode()], NULL, NULL, i);
@@ -27,6 +29,42 @@ llvm_instruction_get_opcode_name(VALUE self) {
   Instruction *i = LLVM_INSTRUCTION(self);
   std::string name = i->getOpcodeName();
   return rb_str_new2(name.c_str());
+}
+
+VALUE 
+llvm_instruction_may_read_from_memory(VALUE self) {
+  DATA_GET_INSTRUCTION
+  return i->mayReadFromMemory() ? Qtrue : Qfalse;
+}
+
+VALUE 
+llvm_instruction_may_write_to_memory(VALUE self) {
+  DATA_GET_INSTRUCTION
+  return i->mayWriteToMemory() ? Qtrue : Qfalse;
+}
+
+VALUE
+llvm_instruction_is_identical_to(VALUE self, VALUE ri2) {
+  DATA_GET_INSTRUCTION
+  CHECK_TYPE(ri2, cLLVMInstruction);
+  Instruction *i2 = LLVM_INSTRUCTION(ri2);
+  return i->isIdenticalTo(i2) ? Qtrue : Qfalse;
+}
+
+VALUE 
+llvm_instruction_is_same_operation_as(VALUE self, VALUE ri2) {
+  DATA_GET_INSTRUCTION
+  CHECK_TYPE(ri2, cLLVMInstruction);
+  Instruction *i2 = LLVM_INSTRUCTION(ri2);
+  return i->isSameOperationAs(i2) ? Qtrue : Qfalse;
+}
+
+VALUE
+llvm_instruction_is_used_outside_of_block(VALUE self, VALUE rbb) {
+  DATA_GET_INSTRUCTION
+  CHECK_TYPE(rbb, cLLVMBasicBlock);
+  BasicBlock *bb = LLVM_BASIC_BLOCK(rbb);
+  return i->isUsedOutsideOfBlock(bb) ? Qtrue: Qfalse;
 }
 
 #define DATA_GET_TERMINATOR_INST TerminatorInst *ti; Data_Get_Struct(self, TerminatorInst, ti);

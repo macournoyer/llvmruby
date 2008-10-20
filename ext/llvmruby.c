@@ -63,6 +63,11 @@ VALUE llvm_basic_block_get_instruction_list(VALUE);
 
 VALUE llvm_instruction_inspect(VALUE);
 VALUE llvm_instruction_get_opcode_name(VALUE);
+VALUE llvm_instruction_may_read_from_memory(VALUE);
+VALUE llvm_instruction_may_write_to_memory(VALUE);
+VALUE llvm_instruction_is_identical_to(VALUE, VALUE);
+VALUE llvm_instruction_is_same_operation_as(VALUE, VALUE);
+VALUE llvm_instruction_is_used_outside_of_block(VALUE, VALUE);
 
 VALUE llvm_terminator_inst_num_successors(VALUE);
 VALUE llvm_terminator_inst_get_successor(VALUE, VALUE);
@@ -206,7 +211,12 @@ void Init_llvmruby() {
 
   rb_define_method(cLLVMInstruction, "inspect", llvm_instruction_inspect, 0);
   rb_define_method(cLLVMInstruction, "get_opcode_name", llvm_instruction_get_opcode_name, 0);
-
+  rb_define_method(cLLVMInstruction, "may_read_from_memory?", llvm_instruction_may_read_from_memory, 0);
+  rb_define_method(cLLVMInstruction, "may_write_to_memory?", llvm_instruction_may_write_to_memory, 0);
+  rb_define_method(cLLVMInstruction, "identical_to?", llvm_instruction_is_identical_to, 1);
+  rb_define_method(cLLVMInstruction, "same_operation_as?", llvm_instruction_is_same_operation_as, 1);
+  rb_define_method(cLLVMInstruction, "used_outside_of_block?", llvm_instruction_is_used_outside_of_block, 1);
+  
   rb_define_method(cLLVMTerminatorInst, "num_successors", llvm_terminator_inst_num_successors, 0);
   rb_define_method(cLLVMTerminatorInst, "get_successor", llvm_terminator_inst_get_successor, 1);
   rb_define_method(cLLVMTerminatorInst, "set_successor", llvm_terminator_inst_set_successor, 2);
