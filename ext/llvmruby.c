@@ -16,8 +16,6 @@ VALUE cLLVMInstruction = Qnil;
 VALUE cLLVMTerminatorInst = Qnil;
 VALUE cLLVMUnaryOperator = Qnil;
 VALUE cLLVMBinaryOperator = Qnil;
-VALUE cLLVMLoadInst = Qnil;
-VALUE cLLVMStoreInst = Qnil;
 VALUE cLLVMCmpInst = Qnil;
 VALUE cLLVMICmpInst = Qnil;
 VALUE cLLVMFCmpInst = Qnil;
@@ -29,6 +27,7 @@ VALUE cLLVMPassManager = Qnil;
 VALUE cLLVMExecutionEngine = Qnil;
 
 #define HANDLE_TERM_INST(Num, Opcode, Klass) VALUE cLLVM##Klass;
+#define HANDLE_MEMORY_INST(Num, Opcode, Klass) VALUE cLLVM##Klass;
 #include "llvm/Instruction.def"
 
 void init_types();
@@ -148,18 +147,18 @@ void Init_llvmruby() {
   cLLVMInstruction = rb_define_class_under(cLLVMRuby, "Instruction", cLLVMValue);
   cLLVMUnaryOperator = rb_define_class_under(cLLVMRuby, "UnaryOperator", cLLVMInstruction);
   cLLVMBinaryOperator = rb_define_class_under(cLLVMRuby, "BinaryOperator", cLLVMInstruction);
-  cLLVMLoadInst = rb_define_class_under(cLLVMRuby, "LoadInst", cLLVMUnaryOperator);
-  cLLVMStoreInst = rb_define_class_under(cLLVMRuby, "BinaryOperator", cLLVMInstruction);
-  cLLVMCmpInst = rb_define_class_under(cLLVMRuby, "CmpInst", cLLVMInstruction);
-  cLLVMICmpInst = rb_define_class_under(cLLVMRuby, "ICmpInst", cLLVMCmpInst);
-  cLLVMFCmpInst = rb_define_class_under(cLLVMRuby, "FCmpInst", cLLVMCmpInst);
   cLLVMTerminatorInst = rb_define_class_under(cLLVMRuby, "TerminatorInst", cLLVMInstruction);
-  cLLVMReturnInst = rb_define_class_under(cLLVMRuby, "ReturnInst", cLLVMTerminatorInst);
-  cLLVMBranchInst = rb_define_class_under(cLLVMRuby, "BranchInst", cLLVMTerminatorInst);
-  cLLVMSwitchInst = rb_define_class_under(cLLVMRuby, "SwitchInst", cLLVMTerminatorInst);
   cLLVMAllocationInst = rb_define_class_under(cLLVMRuby, "AllocationInst", cLLVMInstruction);
   cLLVMFreeInst = rb_define_class_under(cLLVMRuby, "FreeInst", cLLVMInstruction);
   cLLVMBinaryOps = rb_define_class_under(cLLVMInstruction, "BinaryOps", rb_cObject);
+
+  #define HANDLE_TERM_INST(Num, Opcode, Klass) cLLVM##Klass = rb_define_class_under(cLLVMRuby, #Klass, cLLVMTerminatorInst);
+  #define HANDLE_MEMORY_INST(Num, Opcode, Klass) cLLVM##Klass = rb_define_class_under(cLLVMRuby, #Klass, cLLVMInstruction);
+  #include "llvm/Instruction.def"
+
+  cLLVMCmpInst = rb_define_class_under(cLLVMRuby, "CmpInst", cLLVMInstruction);
+  cLLVMICmpInst = rb_define_class_under(cLLVMRuby, "ICmpInst", cLLVMCmpInst);
+  cLLVMFCmpInst = rb_define_class_under(cLLVMRuby, "FCmpInst", cLLVMCmpInst);
   cLLVMPhi = rb_define_class_under(cLLVMRuby, "Phi", cLLVMValue);
 
   cLLVMPassManager = rb_define_class_under(cLLVMRuby, "PassManager", rb_cObject);

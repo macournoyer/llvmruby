@@ -33,15 +33,16 @@ extern VALUE cLLVMVectorType;
 extern VALUE cLLVMFunctionType;
 extern VALUE cLLVMInstruction;
 extern VALUE cLLVMBinaryOperator;
+extern VALUE cLLVMAllocationInst;
 
 #define HANDLE_TERM_INST(Num, Opcode, Klass) extern VALUE cLLVM##Klass;
+#define HANDLE_MEMORY_INST(Num, Opcode, Klass) extern VALUE cLLVM##Klass;
+#define HANDLE_OTHER_INST(Num, Opcode, Klass) extern VALUE cLLVM##Klass;
 #include "llvm/Instruction.def"
 
 extern VALUE cLLVMBinaryOps;
 extern VALUE cLLVMPhi;
 extern VALUE cLLVMPassManager;
-
-
 
 #define LLVM_VAL(obj) ((Value*)DATA_PTR(obj))
 #define LLVM_TYPE(obj) ((Type*)DATA_PTR(obj))
