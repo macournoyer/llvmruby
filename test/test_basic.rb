@@ -278,7 +278,8 @@ class BasicTests < Test::Unit::TestCase
       assert_kind_of(Type, new_space.allocated_type)
       assert_equal(0, new_space.alignment)
 
-      b.store(23.llvm(MACHINE_WORD), new_space)    
+      store_inst = b.store(23.llvm(MACHINE_WORD), new_space)    
+      assert(store_inst.may_write_to_memory?)
       v = b.load(new_space)
       free_inst = b.free(new_space)
       assert_kind_of(FreeInst, free_inst)

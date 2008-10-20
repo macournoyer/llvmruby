@@ -122,8 +122,8 @@ llvm_builder_switch(VALUE self, VALUE rv, VALUE rdefault) {
   Value *v;
   Data_Get_Struct(rv, Value, v);
 
-  Value* switch_instr = builder->CreateSwitch(v, deflt);
-  return Data_Wrap_Struct(cLLVMSwitchInst, NULL, NULL, switch_instr);
+  Instruction *switch_instr = builder->CreateSwitch(v, deflt);
+  return llvm_instruction_wrap(switch_instr);
 }
 
 VALUE
@@ -134,16 +134,16 @@ llvm_builder_malloc(VALUE self, VALUE rtype, VALUE rsize) {
   Data_Get_Struct(rtype, Type, type);
 
   Value *size = ConstantInt::get(Type::Int32Ty, FIX2INT(rsize));
-  Value *v = builder->CreateMalloc(type, size);
-  return Data_Wrap_Struct(cLLVMAllocationInst, NULL, NULL, v);
+  Instruction *v = builder->CreateMalloc(type, size);
+  return llvm_instruction_wrap(v);
 }
 
 VALUE
 llvm_builder_free(VALUE self, VALUE rptr) {
    DATA_GET_BUILDER
    Value *v = LLVM_VAL(rptr);
-   Value *free_inst = builder->CreateFree(v);
-   return Data_Wrap_Struct(cLLVMFreeInst, NULL, NULL, free_inst);
+   Instruction *free_inst = builder->CreateFree(v);
+   return llvm_instruction_wrap(free_inst);
 }
   
 VALUE 
@@ -154,7 +154,7 @@ llvm_builder_alloca(VALUE self, VALUE rtype, VALUE rsize) {
   Data_Get_Struct(rtype, Type, type);
 
   Value *size = ConstantInt::get(Type::Int32Ty, FIX2INT(rsize));
-  Value *v = builder->CreateAlloca(type, size);
+  Instruction *v = builder->CreateAlloca(type, size);
   return Data_Wrap_Struct(cLLVMAllocationInst, NULL, NULL, v);
 }
 

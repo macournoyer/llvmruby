@@ -194,6 +194,7 @@ void init_instructions() {
   // Need to be able to quickly look up at runtime Ruby classes cooresponding to LLVM classes
   #define HANDLE_TERM_INST(Num, Opcode, Klass) gInstructionClasses[Num] = cLLVM##Klass;
   #define HANDLE_BINARY_INST(Num, Opcode, Klass) gInstructionClasses[Num] = cLLVM##Klass; 
+  #define HANDLE_MEMORY_INST(Num, Opcode, Klass) gInstructionClasses[Num] = cLLVM##Klass;
   #include "llvm/Instruction.def"
   
   // Standard binary operators

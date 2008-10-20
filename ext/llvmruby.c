@@ -14,7 +14,7 @@ VALUE cLLVMVectorType = Qnil;
 VALUE cLLVMFunctionType = Qnil;
 VALUE cLLVMInstruction = Qnil;
 VALUE cLLVMTerminatorInst = Qnil;
-VALUE cLLVMUnaryOperator = Qnil;
+VALUE cLLVMUnaryInstruction = Qnil;
 VALUE cLLVMBinaryOperator = Qnil;
 VALUE cLLVMCmpInst = Qnil;
 VALUE cLLVMICmpInst = Qnil;
@@ -150,16 +150,21 @@ void Init_llvmruby() {
   cLLVMBuilder = rb_define_class_under(cLLVMRuby, "Builder", rb_cObject);
 
   cLLVMInstruction = rb_define_class_under(cLLVMRuby, "Instruction", cLLVMValue);
-  cLLVMUnaryOperator = rb_define_class_under(cLLVMRuby, "UnaryOperator", cLLVMInstruction);
+  cLLVMUnaryInstruction = rb_define_class_under(cLLVMRuby, "UnaryInstruction", cLLVMInstruction);
   cLLVMBinaryOperator = rb_define_class_under(cLLVMRuby, "BinaryOperator", cLLVMInstruction);
   cLLVMTerminatorInst = rb_define_class_under(cLLVMRuby, "TerminatorInst", cLLVMInstruction);
   cLLVMAllocationInst = rb_define_class_under(cLLVMRuby, "AllocationInst", cLLVMInstruction);
-  cLLVMFreeInst = rb_define_class_under(cLLVMRuby, "FreeInst", cLLVMInstruction);
   cLLVMBinaryOps = rb_define_class_under(cLLVMInstruction, "BinaryOps", rb_cObject);
 
   #define HANDLE_TERM_INST(Num, Opcode, Klass) cLLVM##Klass = rb_define_class_under(cLLVMRuby, #Klass, cLLVMTerminatorInst);
-  #define HANDLE_MEMORY_INST(Num, Opcode, Klass) cLLVM##Klass = rb_define_class_under(cLLVMRuby, #Klass, cLLVMInstruction);
   #include "llvm/Instruction.def"
+
+  cLLVMLoadInst = rb_define_class_under(cLLVMRuby, "LoadInst", cLLVMUnaryInstruction);
+  cLLVMStoreInst = rb_define_class_under(cLLVMRuby, "StoreInst", cLLVMInstruction);
+  cLLVMFreeInst = rb_define_class_under(cLLVMRuby, "FreeInst", cLLVMUnaryInstruction);
+  cLLVMGetElementPtrInst = rb_define_class_under(cLLVMRuby, "GetElementPtrInst", cLLVMInstruction);
+  cLLVMAllocaInst = rb_define_class_under(cLLVMRuby, "AllocaInst", cLLVMAllocationInst);
+  cLLVMMallocInst = rb_define_class_under(cLLVMRuby, "MallocInst", cLLVMAllocationInst);
 
   cLLVMCmpInst = rb_define_class_under(cLLVMRuby, "CmpInst", cLLVMInstruction);
   cLLVMICmpInst = rb_define_class_under(cLLVMRuby, "ICmpInst", cLLVMCmpInst);
