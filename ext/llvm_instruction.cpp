@@ -1,4 +1,4 @@
-#include "llvmruby.h"
+#include "llvmruby.h" 
 #include <sstream>
 
 extern VALUE cLLVMInstruction;
@@ -6,9 +6,12 @@ extern VALUE cLLVMBinaryOps;
 
 extern "C" {
 
+#define LAST_INSTRUCTION_NUM 100
+VALUE gInstructionClasses[LAST_INSTRUCTION_NUM];
+
 VALUE
 llvm_instruction_wrap(Instruction* i) {
-   return Data_Wrap_Struct(cLLVMInstruction, NULL, NULL, i);
+   return Data_Wrap_Struct(gInstructionClasses[i->getOpcode()], NULL, NULL, i);
 }
 
 VALUE
@@ -146,6 +149,15 @@ llvm_allocation_inst_alignment(VALUE self) {
 #define DEFINE_CAST(name) rb_define_const(cLLVMInstruction, #name, INT2FIX(Instruction::name));
 
 void init_instructions() {
+  for(int i = 0; i < LAST_INSTRUCTION_NUM; ++i) {
+    gInstructionClasses[i] = cLLVMInstruction;
+  }
+
+  // Need to be able to quickly look up at runtime Ruby classes cooresponding to LLVM classes
+  #define HANDLE_TERM_INST(Num, Opcode, Klass) gInstructionClasses[Num] = cLLVM##Klass;
+  #define HANDLE_BINARY_INST(Num, Opcode, Klass) gInstructionClasses[Num] = cLLVM##Klass; 
+  #include "llvm/Instruction.def"
+  
   // Standard binary operators
   DEFINE_BINARY_INST(Add)
   DEFINE_BINARY_INST(Sub)

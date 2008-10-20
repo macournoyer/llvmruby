@@ -37,10 +37,18 @@ class InstructionTests < Test::Unit::TestCase
     b = bbs[0]
     assert_equal(8,b.size)
 
-    expected_opcodes_in_bswap = ["shl", "shl", "and", "lshr", "and", "lshr", "and", "or", "or", "ret"]
+    expected_opcodes_in_bswap = ["shl", "shl", "and", "lshr", "and", "or", "or", "ret"]
     ins = b.get_instruction_list
     actual_opcodes_in_bswap = ins.map { |i| i.get_opcode_name}
-    assert(expected_opcodes_in_bswap, actual_opcodes_in_bswap)
+    assert_equal(expected_opcodes_in_bswap, actual_opcodes_in_bswap)
+    
+    assert_kind_of(BinaryOperator, ins.first)
+    assert_kind_of(ReturnInst, ins.last)
+  end
+
+  def test_instruction_classes
+    #m = LLVM::Module.read_assembly(@assembly_byteswap)
+    #bswap = m.get_function('bswap')
   end
 
   def test_branch_instructions

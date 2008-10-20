@@ -13,6 +13,7 @@ VALUE cLLVMArrayType = Qnil;
 VALUE cLLVMVectorType = Qnil;
 VALUE cLLVMFunctionType = Qnil;
 VALUE cLLVMInstruction = Qnil;
+VALUE cLLVMTerminatorInst = Qnil;
 VALUE cLLVMUnaryOperator = Qnil;
 VALUE cLLVMBinaryOperator = Qnil;
 VALUE cLLVMLoadInst = Qnil;
@@ -20,16 +21,15 @@ VALUE cLLVMStoreInst = Qnil;
 VALUE cLLVMCmpInst = Qnil;
 VALUE cLLVMICmpInst = Qnil;
 VALUE cLLVMFCmpInst = Qnil;
-VALUE cLLVMTerminatorInst = Qnil;
-VALUE cLLVMReturnInst = Qnil;
-VALUE cLLVMBranchInst = Qnil;
-VALUE cLLVMSwitchInst = Qnil;
 VALUE cLLVMAllocationInst = Qnil;
 VALUE cLLVMFreeInst = Qnil;
 VALUE cLLVMPhi = Qnil;
 VALUE cLLVMBinaryOps = Qnil;
 VALUE cLLVMPassManager = Qnil;
 VALUE cLLVMExecutionEngine = Qnil;
+
+#define HANDLE_TERM_INST(Num, Opcode, Klass) VALUE cLLVM##Klass;
+#include "llvm/Instruction.def"
 
 void init_types();
 VALUE llvm_type_pointer(VALUE, VALUE);
