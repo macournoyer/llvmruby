@@ -32,11 +32,19 @@ extern VALUE cLLVMArrayType;
 extern VALUE cLLVMVectorType;
 extern VALUE cLLVMFunctionType;
 extern VALUE cLLVMInstruction;
+extern VALUE cLLVMUnaryOperator;
+extern VALUE cLLVMBinaryOperator;
+extern VALUE cLLVMLoadInst;
+extern VALUE cLLVMStoreInst;
+extern VALUE cLLVMCmpInst;
+extern VALUE cLLVMICmpInst;
+extern VALUE cLLVMFCmpInst;
 extern VALUE cLLVMTerminatorInst;
 extern VALUE cLLVMReturnInst;
 extern VALUE cLLVMBranchInst;
 extern VALUE cLLVMSwitchInst;
 extern VALUE cLLVMAllocationInst;
+extern VALUE cLLVMFreeInst;
 extern VALUE cLLVMBinaryOps;
 extern VALUE cLLVMPhi;
 extern VALUE cLLVMPassManager;
@@ -51,7 +59,7 @@ extern VALUE cLLVMPassManager;
 #define LLVM_PHI(obj) ((PHINode*)DATA_PTR(obj))
 
 #define CHECK_TYPE(val, klass)\
-  if(CLASS_OF(val) != klass) {\
+  if(!rb_obj_is_kind_of(val, klass)) {\
     rb_raise(rb_eTypeError, "wrong argument type: %s given, expected %s", rb_obj_classname(val), rb_class2name(klass));\
   }
 

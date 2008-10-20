@@ -49,8 +49,6 @@ llvm_builder_set_insert_point(VALUE self, VALUE rbb) {
 VALUE 
 llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
   Check_Type(rbin_op, T_FIXNUM);
-  //CHECK_TYPE(rv1, cLLVMValue);
-  //CHECK_TYPE(rv2, cLLVMValue);
   DATA_GET_BUILDER
 
   Instruction::BinaryOps bin_op = (Instruction::BinaryOps)FIX2INT(rbin_op);
@@ -59,7 +57,7 @@ llvm_builder_bin_op(VALUE self, VALUE rbin_op, VALUE rv1, VALUE rv2) {
   Data_Get_Struct(rv1, Value, v1);
   Data_Get_Struct(rv2, Value, v2);
   Value *res = builder->CreateBinOp(bin_op, v1, v2);
-  return llvm_value_wrap(res);
+  return Data_Wrap_Struct(cLLVMBinaryOperator, NULL, NULL, res);
 }
 
 VALUE
@@ -73,15 +71,17 @@ llvm_builder_phi(VALUE self, VALUE type) {
 VALUE
 llvm_phi_add_incoming(VALUE self, VALUE val, VALUE rbb) {
   CHECK_TYPE(val, cLLVMValue);
+
   DATA_GET_BLOCK
   PHINode *phi = LLVM_PHI(self);
+
   phi->addIncoming(LLVM_VAL(val), bb);
   return self;
 }
 
 VALUE 
 llvm_builder_return(VALUE self, VALUE rv) {
-  //CHECK_TYPE(rv, cLLVMValue);
+  CHECK_TYPE(rv, cLLVMValue);
   DATA_GET_BUILDER
   return Data_Wrap_Struct(cLLVMReturnInst, NULL, NULL, builder->CreateRet(LLVM_VAL(rv)));
 }
@@ -142,8 +142,8 @@ VALUE
 llvm_builder_free(VALUE self, VALUE rptr) {
    DATA_GET_BUILDER
    Value *v = LLVM_VAL(rptr);
-   builder->CreateFree(v);
-   return Qtrue;
+   Value *free_inst = builder->CreateFree(v);
+   return Data_Wrap_Struct(cLLVMFreeInst, NULL, NULL, free_inst);
 }
   
 VALUE 
@@ -164,7 +164,7 @@ llvm_builder_load(VALUE self, VALUE rptr) {
 
   Value *ptr;
   Data_Get_Struct(rptr, Value, ptr);
-  return llvm_value_wrap(builder->CreateLoad(ptr));
+  return Data_Wrap_Struct(cLLVMLoadInst, NULL, NULL, builder->CreateLoad(ptr));
 }
 
 VALUE
@@ -174,7 +174,7 @@ llvm_builder_store(VALUE self, VALUE rv, VALUE rptr) {
   Value *v, *ptr;
   Data_Get_Struct(rv, Value, v);
   Data_Get_Struct(rptr, Value, ptr);
-  return llvm_value_wrap(builder->CreateStore(v, ptr));
+  return Data_Wrap_Struct(cLLVMStoreInst, NULL, NULL, builder->CreateStore(v, ptr));
 }
 
 VALUE
@@ -183,7 +183,7 @@ llvm_builder_icmp(VALUE self, VALUE pred, VALUE lhs, VALUE rhs) {
 
   CmpInst::Predicate p = (CmpInst::Predicate)FIX2INT(pred);
   Value *v = builder->CreateICmp(p, LLVM_VAL(lhs), LLVM_VAL(rhs));
-  return llvm_value_wrap(v);
+  return Data_Wrap_Struct(cLLVMICmpInst, NULL, NULL, v);
 }
 
 VALUE
@@ -192,7 +192,7 @@ llvm_builder_fcmp(VALUE self, VALUE pred, VALUE lhs, VALUE rhs) {
 
   CmpInst::Predicate p = (CmpInst::Predicate)FIX2INT(pred);
   Value *v = builder->CreateFCmp(p, LLVM_VAL(lhs), LLVM_VAL(rhs));
-  return llvm_value_wrap(v);
+  return Data_Wrap_Struct(cLLVMFCmpInst, NULL, NULL, v);
 }
 
 VALUE

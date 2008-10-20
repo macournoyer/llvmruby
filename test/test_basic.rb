@@ -280,7 +280,8 @@ class BasicTests < Test::Unit::TestCase
 
       b.store(23.llvm(MACHINE_WORD), new_space)    
       v = b.load(new_space)
-      b.free(new_space)
+      free_inst = b.free(new_space)
+      assert_kind_of(FreeInst, free_inst)
       b.return(v)
     end
   end
