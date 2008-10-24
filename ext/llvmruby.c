@@ -37,6 +37,8 @@ VALUE llvm_type_array(VALUE, VALUE, VALUE);
 VALUE llvm_type_vector(VALUE, VALUE, VALUE);
 VALUE llvm_type_function2(VALUE, VALUE);
 VALUE llvm_type_function(VALUE, VALUE, VALUE);
+VALUE llvm_type_to_s(VALUE);
+VALUE llvm_type_type_id(VALUE);
 
 void init_instructions();
 
@@ -120,6 +122,7 @@ VALUE llvm_value_get_immediate_constant(VALUE);
 VALUE llvm_value_get_struct_constant(int, VALUE*, VALUE);
 VALUE llvm_value_name(VALUE);
 VALUE llvm_value_set_name(VALUE, VALUE);
+VALUE llvm_value_type(VALUE);
 VALUE llvm_value_num_uses(VALUE);
 VALUE llvm_value_used_in_basic_block(VALUE, VALUE);
 VALUE llvm_value_replace_all_uses_with(VALUE, VALUE);
@@ -180,6 +183,8 @@ void Init_llvmruby() {
   rb_define_module_function(cLLVMType, "array", llvm_type_array, 2);
   rb_define_module_function(cLLVMType, "vector", llvm_type_vector, 2);
   rb_define_module_function(cLLVMType, "function", llvm_type_function, -1);
+  rb_define_method(cLLVMType, "to_s", llvm_type_to_s, 0);
+  rb_define_method(cLLVMType, "type_id", llvm_type_type_id, 0);
 
   rb_define_module_function(cLLVMValue, "get_constant", llvm_value_get_constant, 2);
   rb_define_module_function(cLLVMValue, "get_float_constant", llvm_value_get_float_constant, 1);
@@ -188,6 +193,7 @@ void Init_llvmruby() {
   rb_define_module_function(cLLVMValue, "get_struct_constant", llvm_value_get_struct_constant, -1);
   rb_define_method(cLLVMValue, "name", llvm_value_name, 0);
   rb_define_method(cLLVMValue, "name=", llvm_value_set_name, 1);
+  rb_define_method(cLLVMValue, "type", llvm_value_type, 0);
   rb_define_method(cLLVMValue, "num_uses", llvm_value_num_uses, 0);
   rb_define_method(cLLVMValue, "used_in_basic_block?", llvm_value_used_in_basic_block, 1);
   rb_define_method(cLLVMValue, "replace_all_uses_with", llvm_value_replace_all_uses_with, 1);

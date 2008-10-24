@@ -28,6 +28,14 @@ llvm_value_set_name(VALUE self, VALUE rname) {
   return rname; 
 }
 
+VALUE
+llvm_value_type(VALUE self) {
+  Value *v;
+  Data_Get_Struct(self, Value, v);
+  const Type *t = v->getType();  
+  return Data_Wrap_Struct(cLLVMType, NULL, NULL, (void*) t);;
+}
+
 VALUE 
 llvm_value_num_uses(VALUE self) {
   Value *v;
@@ -145,6 +153,20 @@ llvm_type_function(int argc, VALUE *argv, VALUE self) {
   const Type *ret_type = LLVM_TYPE(rret_type);
   FunctionType *ftype = FunctionType::get(ret_type, arg_types, RTEST(var_args));
   return Data_Wrap_Struct(cLLVMFunctionType, NULL, NULL, ftype);
+}
+
+VALUE 
+llvm_type_to_s(VALUE self) {
+  Type *type;
+  Data_Get_Struct(self, Type, type);
+  return rb_str_new2(type->getDescription().c_str());
+}
+
+VALUE 
+llvm_type_type_id(VALUE self) {
+  Type *type;
+  Data_Get_Struct(self, Type, type);
+  return INT2FIX((int) type->getTypeID());
 }
 
 void init_types() {

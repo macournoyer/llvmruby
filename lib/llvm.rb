@@ -29,6 +29,10 @@ class LLVM::Value
 end
 
 module LLVM
+  # enum llvm::Type::TypeID
+  VoidTyID, FloatTyID, DoubleTyID, X86_FP80TyID, FP128TyID, PPC_FP128TyID, LabelTyID, IntegerTyID, 
+  FunctionTyID, StructTyID, ArrayTyID, PointerTyID, OpaqueTyID, VectorTyID = (0..13).to_a
+  
   class Builder
     def self.add_bin_op(op)
       define_method(op.downcase) do |x, y|

@@ -1,4 +1,5 @@
 require 'test/unit'
+$:.unshift File.dirname(__FILE__) + "/../ext"
 require 'llvm'
 
 include LLVM
@@ -327,5 +328,13 @@ class BasicTests < Test::Unit::TestCase
   def test_pass_manager_run
     m = LLVM::Module.new('test')
     assert PassManager.new.run(m)
+  end
+  
+  def test_type_to_s
+    assert_equal "i32", 2.llvm.type.to_s
+  end
+
+  def test_type_type_id
+    assert_equal IntegerTyID, 2.llvm.type.type_id
   end
 end
